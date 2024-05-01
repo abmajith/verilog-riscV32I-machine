@@ -67,4 +67,4 @@ There are 4 core instruction formats (R/I/S/U) in *RV32I*, lets list them here.
 So far, we know rs2, rs1 represents second and first register source address, rd represents destination register address.
 imm is a 32 bits value (data or address), the reason why we have two parts imm[31:12] and imm[11:0] in the instruction set is, we can't load 32 bit value (either address or data from memory) in a single instruction cycle into register, it is a clever way of having two instructions to load a single 32 bit into register from memory or I/O. 
 
-Now we will see what *opcode, funct3 and funct7* represents in the instruction.
+Now we will see what *opcode, funct3 and funct7* represents in the instructions.
