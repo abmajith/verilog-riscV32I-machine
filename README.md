@@ -58,6 +58,5 @@ Encoding itself contains information about what registers we are operating (5bit
 To dicuss more, lets write this encoding in abstract variable format
 
 Funct7 rs2 rs1 Funct3 rd Opcode7,  add the subscript of Funct, Opcode + 15 (a 3, 5 bit address for register mapping) will get 32. 
-Few more observations, only difference between addition and subtraction is the 2 MSB of the opcode, all the rest are same. 
 
 
