@@ -94,7 +94,7 @@ Now we will see what *opcode, funct3 and funct7* represents in the instructions.
 **Opcode** a 7 bits subfield always located on the 7 LSBs of the instructions. an opcode[7:0], two LSBs are always 11 for *RV32I*, and always opcode[4:2] is not equal to 111. The reason for this encoding constraints are for natural encoding extension schemes for 16, 48, 64, >192 bits instructions sets defined in *RISC-V*. Note we are only looking after *RV32I* base format.
 
 Opcode Value | represents | meaning, instruction type        |  calculation                 | #variants
-------------------------------------------------------------------------------------------------------------
+---------|---------|-----------------------------------------|------------------------------|----------------
 0110111  | *LUI*   |  load up immediate, *U-type*            | reg <- (im << 12)            | 1
 0010111  | *AUIPC* |  add upper immediate to *PC* register   | reg <- PC << 12              | 1 
 1101111  | *JAL*   |  jump and link, *J-type*                | reg <- PC+4 ; PC <- PC+imm   | 1
