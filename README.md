@@ -77,17 +77,28 @@ Presense of *Funct3, Funct7, Immediate and Register fields* depends on the instr
 There are totally 6 different encoding format presents in *RV32I*, among them 4 are core instruction formats (R/I/S/U) in *RV32I* and two additional formats (B/J), lets list them here.
 
 
-**R-type** (Register Type)       : format *funct7     rs2   rs1 funct3 rd          opcode* <br />
-**I-type** (Immediate Type)      : format *imm[11:0]        rs1 funct3 rd          opcode* <br />
-**S-type** (Store Type)          : format *imm[11:5]  rs2   rs1 funct3 imm[4:0]    opcode* <br />
-**B-type** (Branch Type)         : format *imm[12|10:5] rs2 rs1 funct3 imm[4:1|11] opcode* <br />
-**U-type** (Upper Immediate Type): format *imm[31:12]                  rd          opcode* <br />
-**J-type** (Jump Type)           : format *imm[20|10:1|11|19:12]       rd          opcode* <br />
+**R-type** (Register Type)       : format *Funct7     rs2   rs1 Funct3 rd          Opcode* <br />
+**I-type** (Immediate Type)      : format *imm[11:0]        rs1 Funct3 rd          Opcode* <br />
+**S-type** (Store Type)          : format *imm[11:5]  rs2   rs1 Funct3 imm[4:0]    Opcode* <br />
+**B-type** (Branch Type)         : format *imm[12|10:5] rs2 rs1 Funct3 imm[4:1|11] Opcode* <br />
+**U-type** (Upper Immediate Type): format *imm[31:12]                  rd          Opcode* <br />
+**J-type** (Jump Type)           : format *imm[20|10:1|11|19:12]       rd          Opcode* <br />
 
 
 So far, we know rs2, rs1 and rd are Register fields in the encoding scheme, and rs2, rs1 represents second and first register source address, rd represents destination register address.
 
 imm is a variable length subfield bits represent immediate contant value encoded within the instructions. It is 12, 12, 12, 20 and 20 bits wide in *I, S, B, U* and *J* type instructions.
+
+As you see, position of *Opcode* and *rs1,rs2, Funct3, Funct7* are consistent in its position if it exists in encoding, unlike *imm* constant value. 
+
+Instance Type | Immediate Encoding format                                          | Denote it as 
+--------------|-----------------------------------------------------------------------------------
+*R-Type*      | Not present                                                        | none
+*I-Type*      | 12 bits, sign expansion                                            | *Iimm*
+*S-Type*      | 12 bits, sign expansion (stored in two parts)                      | *Simm*
+*B-Type*      | 12 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Bimm*
+*U-Type*      | 20 bits, upper [31:12] and set 12 LSB's into zero                  | *Uimm*
+*J-Type*	  | 20 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Jimm*
 
 
 **Opcode** a 7 bits wide subfield always located on 7 bits LSBs of the instructions. In *RV32I* base format opcode[7:0] two LSBs are always *11*, and opcode[4:2] is never equal to *111*. The reason for these encoding constraints are for natural encoding extension schemes for *16, 48, 64, >=192* bits instructions sets defined in *RISC-V*. Note we are only looking after *RV32I* base format.
@@ -127,23 +138,60 @@ Opcode Value | represents | meaning, instruction type        |  calculation     
 		 - Arithmetic Instructions: operates 32 bit arithmetic operations (pure *R-type*) on register values. 
 
 		 - Fence and Systems: are used to implement memory ordering in multicore systems, and system calls/ebreak respectively.
-Lets look into opcode and decide what kind of opcode instruction we should do based on double equal assignment statement in verilog code.
+Lets look into opcode and decide opcode instruction using double equal check statement in verilog code.
 ```verilog
 
 reg [31:0] inst; // a 32 bit instruction encoding
 ...
 wire is_alu_reg  = (inst[6:0] == 7'b0110011); // rd <- rs1 OP rs2
-wire is_alu_imm  = (inst[6:0] == 7'b0010011); // rd <- rs1 OP Iimm[11:0]
-wire is_load     = (inst[6:0] == 7'b0000011); // rd <- mem[rs1+Iimm[11:0]]
-wire is_store    = (inst[6:0] == 7'b0100011); // mem[rs1+Iimm[11:0]] <- rd
-wire is_branch   = (inst[6:0] == 7'b1100011); // if (rs1 OP rs2) PC <- PC + {Bimm[12:1],0}
-wire is_jalr     = (inst[6:0] == 7'b1100111); // rd <- PC+4; PC<-rs1+Iimm[11:0]
-wire is_jal      = (inst[6:0] == 7'b1101111); // rd <- PC+4; PC <- PC+{Jimm[20:1],0}
-wire is_lui      = (inst[6:0] == 7'b0110111); // rd <- Uimm[31:12] << 12
-wire is_auipc    = (inst[6:0] == 7'b0010111); // rd <- PC + (Uimm[31:12] << 12)
+wire is_alu_imm  = (inst[6:0] == 7'b0010011); // rd <- rs1 OP Iimm
+wire is_load     = (inst[6:0] == 7'b0000011); // rd <- mem[rs1+Iimm]
+wire is_store    = (inst[6:0] == 7'b0100011); // mem[rs1+Iimm] <- rd
+wire is_branch   = (inst[6:0] == 7'b1100011); // if (rs1 OP rs2) PC <- PC + {Bimm,0}
+wire is_jalr     = (inst[6:0] == 7'b1100111); // rd <- PC+4; PC<-rs1+Iimm
+wire is_jal      = (inst[6:0] == 7'b1101111); // rd <- PC+4; PC <- PC+{Jimm,0}
+wire is_lui      = (inst[6:0] == 7'b0110111); // rd <- Uimm
+wire is_auipc    = (inst[6:0] == 7'b0010111); // rd <- PC + Uimm
 wire is_system   = (inst[6:0] == 7'b1110011); // special system call
 wire is_fence    = (inst[6:0] == 7'b0001111); // special memory ordering in multicore system
 ```
 
-Opcode helps us to narrow down the instruction has to perform, *funct3* and *funct7* will help us to further narrow down and choose the appropriate variant of the instruction type and 
-execute in hdl design. 
+Opcode helps us to narrow down the instruction selection, additionally *Funct3* and *Funct7* will help us to further narrow down and choose appropriate variant of the instruction type and execute in hdl design. 
+
+**Arithmetic R-Type Instructions**
+Arithmetic instruction *R-type*, a most simplest encoding. Here *R-type* arithmetic instructions have 10 variants, they are 
+```
+ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND
+```
+They are for addition, subtraction, shift left logical, set less than, set less than for unsigned numbers, bitwise *xor*, shift right logical, shift right with sign expansion, bitwise *or* and bitwise *and* operations.
+
+As the *R* instruction encoding *Funct7 rs2 rs1 Funct3 rd Opcode7*, extracting rs1, rs2 and rd registers address as 
+```verilog
+...
+wire [4:0] addr_rs1 = inst[19:15]; // 5 bits wide first register source address
+wire [4:0] addr_rs2 = inst[24:20]; // 5 bits wide second register source address
+wire [4:0] addr_rd  = inst[11:7];  // 5 bits wide register destination address
+...
+```
+To choose one among 10 variants of arithmetic *R-type* instruction, gather *Funct3, Funct7*
+
+```verilog
+wire [2:0] funct3 = inst[14:12]; // 3 bits wide funct3
+wire [6:0] funct7 = inst[31:25]; // 7 bits wide funct7
+```
+Among *funct3*, it will help us to choose 1 among 8 instructions only. But we have 10 *R-Type* arithmetic instructions. The second most significant bit of *funct7* will be used 
+to decide a instruction along with *funct3*. Bit 5 of *funct7* encodes *ADD/SUB* and *SRA/SRL*. 
+
+
+**Arithmetic I-Type Instructions**
+Arithmetic *I-type*, a second most simplest encoding. Here *I-type* instructions have 9 variants one less than *Arithmetic R-Type*, they are
+```
+ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
+```
+If you checked the both these arithmetic sets, there is no *SUBI*, this excluded instruction functionality met by performing *ADDI* with negative Immediate value. In this way, *RISC-V* limits the number of instruction set.
+
+As the *I* instruction, has two registers address and one immediate value.  Extracting 12 bit immediate value from 12 MSB bits of instruction as
+```verilog
+wire [31:0] Iimm={{21{inst[31]}}, inst[30:20]};
+```
+As you see MSB is the sign of 12 bits intermediate constant, it is appropriately repeated to convert the signed extension of 12 bits immediate value into 32 bits value.
