@@ -76,12 +76,12 @@ Lets break down the basic encoding scheme and fields in the 32 bit instructions.
 There are totally 6 different encoding format presents in *RV32I*, among them 4 are core instruction formats (R/I/S/U) in *RV32I* and two additional formats (B/J), lets list them here.
 
 
-**R-type** format *funct7     rs2   rs1 funct3 rd          opcode*__
-**I-type** format *imm[11:0]        rs1 funct3 rd          opcode*__ 
-**S-type** format *imm[11:5]  rs2   rs1 funct3 imm[4:0]    opcode*__
-**B-type** format *imm[12|10:5] rs2 rs1 funct3 imm[4:1|11] opcode*__
-**U-type** format *imm[31:12]                  rd          opcode*__
-**J-type** format *imm[20|10:1|11|19:12]       rd          opcode*__
+**R-type** format *funct7     rs2   rs1 funct3 rd          opcode* <br />
+**I-type** format *imm[11:0]        rs1 funct3 rd          opcode* <br />
+**S-type** format *imm[11:5]  rs2   rs1 funct3 imm[4:0]    opcode* <br />
+**B-type** format *imm[12|10:5] rs2 rs1 funct3 imm[4:1|11] opcode* <br />
+**U-type** format *imm[31:12]                  rd          opcode* <br />
+**J-type** format *imm[20|10:1|11|19:12]       rd          opcode* <br />
 
 
 So far, we know rs2, rs1 and rd are Register fields in the encoding scheme, and rs2, rs1 represents second and first register source address, rd represents destination register address.
