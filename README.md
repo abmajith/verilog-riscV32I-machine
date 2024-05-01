@@ -106,7 +106,7 @@ Opcode Value | represents | meaning, instruction type        |  calculation     
 0001111  | FENCE   | memory-ordering for multicores          | skip details now             | 1
 1110011  | system  | Instructions EBREAK, ECALL              | skip details now             | 2
 
-Markup : - *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value into the rd addressed register data.
+          - *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value into the rd addressed register data.
 				- For example, *LUI X5 0x12345*,  it loads the 20 bits MSB of instruction encoding (i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*.
 				- Instruction Encoding *imm[31:12](=0x12345) rd(=&X5) 0110111*.
 
