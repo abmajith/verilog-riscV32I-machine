@@ -129,7 +129,21 @@ Opcode Value | represents | meaning, instruction type        |  calculation     
 		 - Fence and Systems: are used to implement memory ordering in multicore systems, and system calls/ebreak respectively.
 Lets look into opcode and decide what kind of opcode instruction we should do based on double equal assignment statement in verilog code.
 ```verilog
-$(cat opcodeDec.v)
+
+reg [31:0] inst; // a 32 bit instruction encoding
+...
+wire is_alu_reg  = (inst[6:0] == 7'b0110011); // rd <- rs1 OP rs2
+wire is_alu_imm  = (inst[6:0] == 7'b0010011); // rd <- rs1 OP Iimm[11:0]
+wire is_load     = (inst[6:0] == 7'b0000011); // rd <- mem[rs1+Iimm[11:0]]
+wire is_store    = (inst[6:0] == 7'b0100011); // mem[rs1+Iimm[11:0]] <- rd
+wire is_branch   = (inst[6:0] == 7'b1100011); // if (rs1 OP rs2) PC <- PC + {Bimm[12:1],0}
+wire is_jalr     = (inst[6:0] == 7'b1100111); // rd <- PC+4; PC<-rs1+Iimm[11:0]
+wire is_jal      = (inst[6:0] == 7'b1101111); // rd <- PC+4; PC <- PC+{Jimm[20:1],0}
+wire is_lui      = (inst[6:0] == 7'b0110111); // rd <- Uimm[31:12] << 12
+wire is_auipc    = (inst[6:0] == 7'b0010111); // rd <- PC + (Uimm[31:12] << 12)
+wire is_system   = (inst[6:0] == 7'b1110011); // special system call
+wire is_fence    = (inst[6:0] == 7'b0001111); // special memory ordering in multicore system
+```
 
 Opcode helps us to narrow down the instruction has to perform, *funct3* and *funct7* will help us to further narrow down and choose the appropriate variant of the instruction type and 
 execute in hdl design. 
