@@ -38,20 +38,17 @@ know some knowledge on *RISC-V*, and its instruction simplicity!.
 
 Quiz: How many bits are needed to address these 32 registers?: Ans: 5 Well, joking, ofcourse I should not write this trival question, when you know the word *RISC V, Verilog*!
 
+**FEW Instructions Example**
+add X3, X1, X2   // Add data of registers X1 and X2, and store in register X3
+Equivalent Encoding is  00000000  rs2 rs1 000 rd 0110011, where rs2, rs1, rd are the 5 bit address to the registers *X2,X1* and *X3*.,
 
-add X3, X1, X2   // Add the contents of registers X1 and X2, and store the result in register X3
-Equivalent Encoding is 
-00000000  rs2 rs1 000 rd 0110011
- where rs2, rs1, rd are the 5 bit address to the registers *X2,X1* and *X3*., that sums up totall 32 bit instruction for the instruction add
+sub x3, x1, x2   // Subtract data of register X2 from register X1, and store in register X3
+Equivalent Encoding is  0100000 rs2 rs1 000 rd 0110011
 
-sub x3, x1, x2   // Subtract the contents of register x2 from register x1, and store the result in register x3
-Equivalent Encoding is 
-0100000 rs2 rs1 000 rd 0110011
-
-mul x3, x1, x2   // Multiply the contents of registers x1 and x2, and store the result in register x3
+mul x3, x1, x2   // Multiply the contents of registers X1 and X2, and store  in register x3
 Encoding is 0000001 rs2 rs1 000 rd 0110011
 
-div x3, x1, x2   // Divide the contents of register x1 by register x2, and store the quotient in register x3
+div x3, x1, x2   // Divide the contents of register x1 by register x2, and store in register x3
 0000001 rs2 rs1 100 rd 0110011
 
 rem x3, x1, x2   // Calculate the remainder when the contents of register x1 is divided by register x2, and store the result in register x3
