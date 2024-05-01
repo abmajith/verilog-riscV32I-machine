@@ -95,7 +95,7 @@ imm is a variable length subfield bits represent immediate contant value encoded
 Opcode Value | represents | meaning, instruction type        |  calculation                 | #variants
 ---------|---------|-----------------------------------------|------------------------------|----------------
 0110111  | *LUI*   |  load up immediate, *U-type*            | reg <- (imm << 12)           | 1
-0010111  | *AUIPC* |  add upper immediate to *PC* register   | reg <- PC + (imm << 12)      | 1 
+0010111  | *AUIPC* |add upper immediate to *PC* register,*U* | reg <- PC + (imm << 12)      | 1 
 1101111  | *JAL*   |  jump and link, *J-type*                | reg <- PC+4 ; PC <- PC+imm   | 1
 1100111  | *JALR*  |  jump and link register, *I-type*       | reg <- PC+4 ; PC <- reg+imm  | 1
 1100011  | branch  |  jump and branch Instructions, *B-type* | if(reg OP reg) PC<-PC+imm    | 6
@@ -127,7 +127,10 @@ Opcode Value | represents | meaning, instruction type        |  calculation     
 		 - Arithmetic Instructions: operates 32 bit arithmetic operations (pure *R-type*) on register values. 
 
 		 - Fence and Systems: are used to implement memory ordering in multicore systems, and system calls/ebreak respectively.
+Lets look into opcode and decide what kind of opcode instruction we should do based on double equal assignment statement in verilog code.
+```verilog
+opcodeDec.v
+```
 
-
-**Funct3**
-**Funct7**
+Opcode helps us to narrow down the instruction has to perform, *funct3* and *funct7* will help us to further narrow down and choose the appropriate variant of the instruction type and 
+execute in hdl design. 
