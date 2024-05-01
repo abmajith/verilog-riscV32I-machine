@@ -130,7 +130,6 @@ Opcode Value | represents | meaning, instruction type        |  calculation     
 Lets look into opcode and decide what kind of opcode instruction we should do based on double equal assignment statement in verilog code.
 ```verilog
 $(cat opcodeDec.v)
-```
 
 Opcode helps us to narrow down the instruction has to perform, *funct3* and *funct7* will help us to further narrow down and choose the appropriate variant of the instruction type and 
 execute in hdl design. 
