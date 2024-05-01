@@ -55,7 +55,7 @@ rem x3, x1, x2   // Calculate the remainder when the contents of register x1 is 
 0000001 rs2 rs1 110 rd 0110011
 
 Encoding itself contains information about what registers we are operating (5bit: 00000 refers to *X0*, 00001 referst to *X1*, and so on).
-To dicuss more, lets write this encoding in abstract variable format (valid only for this arithmetic operations, for other instructions set, we have to go for more high level generalization)
+Lets write this encoding in abstract variable format (valid only for this arithmetic operations, for other instructions set, we will move into high level generalization)
 
-Funct7 rs2 rs1 Funct3 rd Opcode7,  add the subscript of Funct, Opcode + 15 (a 3, 5 bit address for register mapping) will get 32. 
+Funct7 rs2 rs1 Funct3 rd Opcode7,  add the subscript of Funct, Opcode + 15 (a 3, 5 bit address for register mapping) will get 32. So, this is the pattern of arithmetic operations that load and store data within registers.
 
