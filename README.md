@@ -92,7 +92,7 @@ imm is a variable length subfield bits represent immediate contant value encoded
 As you see, position of *Opcode* and *rs1,rs2, Funct3, Funct7* are consistent in its position if it exists in encoding, unlike *imm* constant value. 
 
 Instance Type | Immediate Encoding format                                          | Denote it as 
---------------|-----------------------------------------------------------------------------------
+--------------|--------------------------------------------------------------------|---------------
 *R-Type*      | Not present                                                        | none
 *I-Type*      | 12 bits, sign expansion                                            | *Iimm*
 *S-Type*      | 12 bits, sign expansion (stored in two parts)                      | *Simm*
