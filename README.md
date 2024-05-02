@@ -384,18 +384,18 @@ only procedure difference is, there is no second source register address *addr_r
 instead we have *Iimm* (a signed extension of immediate field).
 
 But wait a minute, we have 9 variants in this type, and we dont have *funct7*, 
-how exactly we choose correct instruction for execution by just using *funct3*?
+how exactly we choose correct instruction for execution by just using *funct3*? <br />
 Ans: Let go back and read *arithmetic I-type instructions*, now we know that only 
-		overlapping can happens for *SRLI, SRAI*, when *funct3==101*. So?
-	    Recall once more information, for doing shift operations in 32 bit 
-		instruction register, we need only 5 LSB's of immediate field, 
-		the remaining 7 bit is not actually needed, 
-	 	when compiler or assembler produce such code, it should efficiently use 
-		this space to inform the hardware to choose either *SRLI* or *SRAI*. 
+overlapping can happens for *SRLI, SRAI*, when *funct3==101*. So?
+Recall once more information, for doing shift operations in 32 bit 
+instruction register, we need only 5 LSB's of immediate field, 
+the remaining 7 bit is not actually needed, 
+when compiler or assembler produce such code, it should efficiently use 
+this space to inform the hardware to choose either *SRLI* or *SRAI*.  <br />
 
-		*RISC-V* have specification for this operation, 
-		if imm[10]th bit (i.e instruction 30th bit) is zero 
-		it has to perform *SRLI* otherwise it has to perform *SRAI*. 
+*RISC-V* have specification for this operation, 
+if imm[10]th bit (i.e instruction 30th bit) is zero 
+it has to perform *SRLI* otherwise it has to perform *SRAI*. 
 
 
 
