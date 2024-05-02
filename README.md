@@ -266,9 +266,9 @@ Usage: *BEQ X1 X2 offset* <br />
 In all these instruction it was clear that the instruction evaluating branching is true or not based on the statement and the datas in the register *X1,X2*, for example 
 if datas in *X1* and *X2* are equal, then *BEQ* will execute the branching protocol, otherwise, *PC* increments normally and continue its execution process. 
 
-If decided to branch, then we have to compute the target code memory address and load it into the *PC*. 
+If decided to do branch, then it computes the target code memory address and load it into the *PC*. 
 This is done by simply extracting offset from *immediate field* (by the procedure *Bimm*), and add offset value to *PC* ( i.e relative branching). 
-Note for branching, we dont have to save the return address, becuase it is branching not function call or interrupt protocol.
+Note for branching, it does not want to save the return address, becuase it is branching not function call or interrupt protocol.
 
 We alreay discussed in some extent the *LUI, AUIPC, JAL* and *JALR*. 
 Lets create a subfolder for each instructions type and write *verilog code*. 
