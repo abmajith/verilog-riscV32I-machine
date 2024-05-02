@@ -90,13 +90,13 @@ There are totally 6 different encoding format presents in *RV32I*, among them 4 
 
 So far, we know rs2, rs1 and rd are Register fields in the encoding scheme, and rs2, rs1 represents second and first register source address, rd represents destination register address.
 
-imm is a variable length subfield bits represent immediate contant value encoded within the instructions. It is 12, 12, 12, 20 and 20 bits wide in *I, S, B, U* and *J* type instructions.
+imm is a variable length subfield bits represent immediate contant value encoded within the instructions. It is 12, 12, 12, 20 and 20 bits wide in *I, S, B, U* and *J* type instructions respectively.
 
-As you see, placement of *rs1,rs2, Funct3, Funct7* encoding in the instruction are consistent if it exists in encoding, unlike *imm* constant value. 
+As you see, placement of *rs1,rs2, Funct3, Funct7* encoding in the instruction are consistent if it exists in encoding, unlike *immediate field*. 
 
 Now, we structure the irregular *Immediate Field* to make the learning and coding process easier. Lets list the *immediate* field organization in different instruction types. 
 
-Instance Type | Immediate Encoding format                                          | Denote it as 
+Instance Type | Immediate Field Encoding format                                    | Denote it as 
 --------------|--------------------------------------------------------------------|---------------
 *R-Type*      | Not present                                                        | none
 *I-Type*      | 12 bits, sign expansion                                            | *Iimm*
@@ -157,7 +157,7 @@ Opcode Value | represents | meaning, instruction type        |  calculation     
 		 - Load and Store Instructions: loads based on *I-type* immediate constant value extraction 
 		 	and store based on *J-type* immediate constant value extraction.
 
-		 - Immediate Instructions: arithmetic operations of *I-type* immediate constant value extraction.
+		 - Immediate Instructions: arithmetic operations of *I-type* immediate constant value extraction and two register datas.
 
 		 - Arithmetic Instructions: operates 32 bit arithmetic operations (pure *R-type*) on register datas. 
 
@@ -263,10 +263,14 @@ Usage: *BEQ X1 X2 offset* <br />
 *BLTU X1 X2 offset* <br />
 *BGEU X1 X2 offset* <br />
 
-In all these instruction it was clear that the instruction kind of evaluating branching is true based on the statement and the datas in the register *X1,X2*, for example 
-if datas in *X1* and *X2* are equal, then *BEQ* will go for the branching, otherwise, *PC* increments normally and continue its execution process. 
+In all these instruction it was clear that the instruction evaluating branching is true or not based on the statement and the datas in the register *X1,X2*, for example 
+if datas in *X1* and *X2* are equal, then *BEQ* will execute the branching protocol, otherwise, *PC* increments normally and continue its execution process. 
 
-If decided to branch, then we have to compute the target memory and load it into the *PC*. This is done by simply extracting offset from *immediate field* (by the procedure *Bimm*), then add that value to PC (relative branching). Note for branching, we dont have to save the return address, becuase it is branching not function call or interrupt protocol. 
+If decided to branch, then we have to compute the target code memory address and load it into the *PC*. 
+This is done by simply extracting offset from *immediate field* (by the procedure *Bimm*), and add offset value to *PC* ( i.e relative branching). 
+Note for branching, we dont have to save the return address, becuase it is branching not function call or interrupt protocol.
 
-
-We alreay discussed in some extent for the *LUI, AUIPC, JAL* and *JALR*. Lets create a subfolder for each instructions type and write *verilog code*. Will do in a way that it will reflect the software development process instead of a documentation of existing or prepared material. 
+We alreay discussed in some extent the *LUI, AUIPC, JAL* and *JALR*. 
+Lets create a subfolder for each instructions type and write *verilog code*. 
+Will do in a way that it will reflect the software development process 
+instead of a documentation of existing or prepared material!. 
