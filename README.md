@@ -374,8 +374,8 @@ set less than immediate unsigned, *xor* immediate, *or* immediate,
 *and* immediate, shift left logical immediate, shift right logical immediate, 
 shift right arithmetic immediate.
 
-If you check these arithmetic immediate sets (*I-type*) with arithmetic 
-register sets (*R-type*), there is no *SUBI*, this excluded instruction 
+If you check these arithmetic immediate instruction sets (*I-type*) with arithmetic 
+instruction register sets (*R-type*), there is no *SUBI*, this excluded instruction 
 functionality is met by performing *ADDI* with negative Immediate value. 
 In this way, *RISC-V* limits the number of instruction sets.
 
@@ -384,7 +384,7 @@ Recall extracting 12-bit immediate value from 12 MSB bits of instruction as
 ```verilog
 wire [31:0] Iimm={{21{inst[31]}}, inst[30:20]};
 ```
-As you see MSB is the sign of 12 bits intermediate constant, 
+As you see MSB is the sign of 12 bits *immediate* constant, 
 it is appropriately repeated for the signed extension of 12 bits immediate 
 value into 32-bit value.
 
