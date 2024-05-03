@@ -188,19 +188,20 @@ Opcode Value | represents | meaning, instruction type        |  calculation
 0001111  | FENCE   | memory-ordering for multicores          | skip details now             | 1 
 1110011  | system  | Instructions EBREAK, ECALL              | skip details now             | 2 
 
-          - *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value (as *Uimm*) into 
+
+- *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value (as *Uimm*) into 
 		  		the rd addressed register data.
 				- For example, *LUI X5 0x12345*,  it loads the 20 bits MSB of instruction encoding 
 					(i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*.
 				- Instruction Encoding *imm[31:12](=0x12345) rd(=&X5) 0110111*.
 
-		 - *AUIPC* Add upper immediate to *PC*, a *U-Type* instruction to add 20 bits wide constant value 
+- *AUIPC* Add upper immediate to *PC*, a *U-Type* instruction to add 20 bits wide constant value 
 		 			(as *Uimm*) with *PC* value, 
 				- For example, *AUIPC X5 0x10000*, it adds the 20 bits MSB of *AUIPC* 
 					instruction encoding (i.e *imm[31:12] = 0x10000*) with *PC* value and stores it in *X5* register.
 				- Instruction Encoding *imm[31:12](=0x10000) rd(=&X5) 0010111*
 		 	
-		 - *JAL*: Jump and Link, a *J-type* instruction to add 20 bits signed offset 
+- *JAL*: Jump and Link, a *J-type* instruction to add 20 bits signed offset 
 		 			(as *Jimm*) with *PC* register data.
 		 		- For example, *JAL X6 offset*, it performs *X6 = PC + 4*, 
 					followed by *PC = PC + Jimm* 
@@ -209,7 +210,7 @@ Opcode Value | represents | meaning, instruction type        |  calculation
 				- Instruction Encoding *imm[20|10:1|11|19:12]  rd(=&X6) 1101111*, 
 					where *offset* is expanded from *imm* using *Jimm* structure.
 
-		 - *JALR*: Jump and Link Register, to add 12 bits signed offset ( as *Iimm*) 
+- *JALR*: Jump and Link Register, to add 12 bits signed offset ( as *Iimm*) 
 		 				with *PC* register data. 
 				- For example, *JALR X2 X1, offset*, it performs *X2 = PC + 4*, 
 					followed by *PC = X1 + Iimm*
@@ -218,19 +219,19 @@ Opcode Value | represents | meaning, instruction type        |  calculation
 				- Instruction Encoding *imm[11:0] rs1(=&X1) 000 rd(=&X2) 1100111*, 
 					where *offset* is expanded from *imm* using *Iimm* structure.
 
-		 - Branch instructions: there are 6 variants on conditional jumps, 
+- Branch instructions: there are 6 variants on conditional jumps, 
 		 		that depends on a test on two registers
 
-		 - Load and Store Instructions: loads based on *I-type* immediate constant value extraction 
+- Load and Store Instructions: loads based on *I-type* immediate constant value extraction 
 		 	and store based on *J-type* immediate constant value extraction.
 
-		 - Immediate Instructions: arithmetic operations of *I-type* immediate constant value 
+- Immediate Instructions: arithmetic operations of *I-type* immediate constant value 
 		 	extraction and two register data.
 
-		 - Arithmetic Instructions: operates 32-bit arithmetic operations (pure *R-type*) 
+- Arithmetic Instructions: operates 32-bit arithmetic operations (pure *R-type*) 
 		 	on register data. 
 
-		 - Fence and Systems: are used to implement memory ordering in multicore systems, 
+- Fence and Systems: are used to implement memory ordering in multicore systems, 
 		 	and system calls/ebreak respectively.
 
 Let's look into opcode and decide opcode instruction using double equal check 
