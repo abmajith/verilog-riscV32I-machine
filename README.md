@@ -10,7 +10,7 @@ how (and not why) a particular base *RV32I* (*RISC-V* 32-bit Integer Instruction
 constructed, so that we can proceed to implement a Verilog instruction simulation circuit.
 We will discover on why part (well for mostly simplicity and respective hardware
 implementation) after going through how *RV32I* encoded and know how to implement
-these instructions in a Verilog simulator and possibly in an FPGA board.
+them in a Verilog simulator and possibly in an FPGA board.
 
 This document is created with reference document **The RISC-V Instruction Set Manual, 
 Volume I: Unprivileged ISA** Use the [Riscv reference manual] (https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf).
@@ -20,7 +20,8 @@ There are four *RISC-V ISA* base architectures,
 *RV32I*, *RV32E* (embeded version of RV32I for energy constraint), *RV64I*, *RV128I*.
 
 *RV32I* it is just a biggining for understanding other *RISC-V ISA* base and extensions. 
-Furthermore, all these base instruction set support integer arithmetic. It does not support floating point arithmetic or integer multiplication/division. 
+Furthermore, all these base instruction set support integer arithmetic. 
+It does not support floating point arithmetic or integer multiplication/division. 
 
 
 *RV32I* contains 40 unique instructions, though can be reduced to 38 instructions 
@@ -29,13 +30,13 @@ for a simple implementation.
 
 *RV32I* Instruction set can be classified into 7 classes (in a simple human-readable way), they are
 
-**Arithmetic Instructions** like addition, subtraction, and bitwise operations.
+**Arithmetic Instructions** like addition, subtraction, and logical bitwise operations.
 
 **Load and Store Instructions** deals with loading data from memory to register, 
-and store data from the register in memory.
+and store data from register to memory area.
 
 **Control Transfer Instructions** deal with the flow of the program, they are conditional 
-(think of if else statement based on register values), unconditional (strict jump), 
+(think of if else statement operations on register values), unconditional (strict jump), 
 procedure calls and returns. 
 
 **Data Transfer Instructions** move data within registers or performing operations 
@@ -79,7 +80,7 @@ reg [31:0] GenReg_PC;             // memory for program counter register
 It is encoded as *0000000  rs2 rs1 000 rd 0110011*, where rs2, rs1, rd are the 5 bits wide 
 address to the registers *X2,X1* and *X3*., <br />
 
-*SUB x3, x1, x2*   // Subtracts tje value in register *X2* from the value in register X1, 
+*SUB x3, x1, x2*   // Subtracts the value in register *X2* from the value in register X1, 
 and store the result in register *X3*. <br />
 It is encoded as *0100000 rs2 rs1 000 rd 0110011* <br />
 
@@ -121,20 +122,21 @@ There are totally 6 different encoding formats present in *RV32I*,
 among them, 4 are core instruction formats (R/I/S/U) in *RV32I* 
 and two additional formats (B/J), let's list them here.
 
-
-**R-type** (Register Type)       : format *Funct7     rs2   rs1 Funct3 rd          Opcode* <br />
-**I-type** (Immediate Type)      : format *imm[11:0]        rs1 Funct3 rd          Opcode* <br />
-**S-type** (Store Type)          : format *imm[11:5]  rs2   rs1 Funct3 imm[4:0]    Opcode* <br />
-**B-type** (Branch Type)         : format *imm[12|10:5] rs2 rs1 Funct3 imm[4:1|11] Opcode* <br />
-**U-type** (Upper Immediate Type): format *imm[31:12]                  rd          Opcode* <br />
-**J-type** (Jump Type)           : format *imm[20|10:1|11|19:12]       rd          Opcode* <br />
+Instruction type                 | encoding format
+---------------------------------|----------------------------------------------------------
+**R-type** (Register Type)       |  *Funct7     rs2   rs1 Funct3 rd          Opcode* 
+**I-type** (Immediate Type)      |  *imm[11:0]        rs1 Funct3 rd          Opcode* 
+**S-type** (Store Type)          |  *imm[11:5]  rs2   rs1 Funct3 imm[4:0]    Opcode* 
+**B-type** (Branch Type)         |  *imm[12|10:5] rs2 rs1 Funct3 imm[4:1|11] Opcode* 
+**U-type** (Upper Immediate Type)|  *imm[31:12]                  rd          Opcode* 
+**J-type** (Jump Type)           |  *imm[20|10:1|11|19:12]       rd          Opcode* 
 
 
 So far, we know rs2, rs1, and rd are Register fields in the encoding scheme, 
 where rs1, and rs2 represent the first and second source register address, and rd represents 
 destination register address.
 
-imm is a variable length subfield bit representing immediate constant value encoded within the instructions. 
+imm is a variable length subfield bit representing immediate constant value encoded within the instruction encoding. 
 It is 12, 12, 12, 20, and 20 bits wide in *I, S, B, U* and *J* type instructions respectively.
 
 As you see, placement of *rs1,rs2, Funct3, Funct7* encoding in the instruction are consistent 
@@ -192,7 +194,7 @@ Opcode Value | represents | meaning, instruction type        |  calculation
 - *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value (as *Uimm*) into 
 		  		the rd addressed register data.
 				- For example, *LUI X5 0x12345*,  it loads the 20 bits MSB of instruction encoding 
-					(i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*.
+					(i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*. 
 				- Instruction Encoding *imm[31:12](=0x12345) rd(=&X5) 0110111*.
 
 - *AUIPC* Add upper immediate to *PC*, a *U-Type* instruction to add 20 bits wide constant value 
