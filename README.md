@@ -55,8 +55,8 @@ If we classify these instructions based on the encoding scheme,
 it will be a total of 6.
 
 **General Purpose Registers**
-It is better to emphasize here that *RV32I* base instruction supports 32 general-purpose registers, 
-each has 32 bits length (named as *X0, X1, ....X31*) and one program counter register (*PC*). 
+It is better to emphasize here that *RV32I* base instruction supports 32 general-purpose registers
+(named as *X0, X1, ....X31*), each has 32 bits length and one program counter register (*PC*). 
 
 Note, there is no special link register (*LR*) or stack pointer (*SP*), nonetheless, 
 hardware designer often reserve *X1,X2* for *LR, SP*. 
@@ -150,7 +150,7 @@ Instance Type | Immediate Field Encoding format                      
 *I-Type*      | 12 bits, sign expansion                                            | *Iimm*
 *S-Type*      | 12 bits, sign expansion (stored in two parts)                      | *Simm*
 *B-Type*      | 12 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Bimm*
-*U-Type*      | 20 bits, upper [31:12] and set 12 LSBs into zero                  | *Uimm*
+*U-Type*      | 20 bits, into upper [31:12] and set 12 LSBs into zero              | *Uimm*
 *J-Type*	  | 20 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Jimm*
 
 
