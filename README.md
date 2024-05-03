@@ -287,45 +287,45 @@ But we have 10 *R-Type* arithmetic instructions. The second most significant bit
 to decide an instruction along with *funct3*. Bit 5 of *funct7* encodes *ADD/SUB* and *SRA/SRL*. 
 
 Let's list the *arithmetic R-type instructions* usage example here
-	- ADD X3 X1 X2, adds the value in registers *X1,X2* and 
+- ADD X3 X1 X2, adds the value in registers *X1,X2* and 
 		store the result in register X3
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 000 rd(=&X3) 0110011*
 
-	- SUB X3 X1 X2, substracts the value in register *X2* from the value 
+- SUB X3 X1 X2, substracts the value in register *X2* from the value 
 		in register *X1* and stores in register *X3*
 		- Instruction Encoding: *0100000 rs2(=&X2) rs1(=&X1) 000 rd(=&X3) 0110011*
 
-	- SLL X3 X1 X2, (shift left logical) shifts the value in the register *X1* 
+- SLL X3 X1 X2, (shift left logical) shifts the value in the register *X1* 
 		left by the number of bits specified in register *X2* (only 5 LSBs matters here) and stores in register *X3*
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 001 rd(=&X3) 0110011*
 
-	- SLT X3 X1 X2, (set less than) sets the register *X3* to 1 
+- SLT X3 X1 X2, (set less than) sets the register *X3* to 1 
 		if the value in register *X1* is less than the value in register *X2*, otherwise 0
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 010 rd(=&X3) 0110011*
 
-	- SLTU X3 X1 X2, (set less than unsigned) sets the register *X3* to 1 if the value 
+- SLTU X3 X1 X2, (set less than unsigned) sets the register *X3* to 1 if the value 
 		in register *X1* is less than the value in register *X2*, otherwise 0
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 011 rd(=&X3) 0110011*
 
-	- XOR X3 X1 X2, (bitwise *xor*) sets the register *X3* 
+- XOR X3 X1 X2, (bitwise *xor*) sets the register *X3* 
 		the result of *xor* operation on the value of registers *X1,X2*.
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 100 rd(=&X3) 0110011*
 
-	- SRL X3 X1 X2, (shift right logical) shifts the value in the register *X1* 
+- SRL X3 X1 X2, (shift right logical) shifts the value in the register *X1* 
 		by the number of bits specified in register *X2* (only 5 LSBs matters here) 
 		and stores in register *X3*, by doing right shift logical, 
 		it will fill the leading values by zero i.e zero-fill
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 101 rd(=&X3) 0110011*
 
-	- SRA X3 X1 X2, (shift right arithmetic) shifts the value in the register 
+- SRA X3 X1 X2, (shift right arithmetic) shifts the value in the register 
 		*X1* by the number of bits specified in register *X2* (only 5 LSBs matters here) 
 		and stores in register *X3*, by doing right shift arithmetic, 
 		it will fill the leading values by signed value i.e *X1[31]* msb of *X1* value.
 		- Instruction Encoding: *0100000 rs2(=&X2) rs1(=&X1) 101 rd(=&X3) 0110011*
-	- OR X3 X1 X2, (bitwise *or*) sets the register *X3* the result of *or* 
+- OR X3 X1 X2, (bitwise *or*) sets the register *X3* the result of *or* 
 		operation on the value of registers *X1, X2*.
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 110 rd(=&X3) 0110011*
-	- AND X3 X1 X2, (bitwise *and*) sets the register *X3* the result of *and* 
+- AND X3 X1 X2, (bitwise *and*) sets the register *X3* the result of *and* 
 		operation on the value of registers *X1, X2*.
 		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 111 rd(=&X3) 0110011*
 
