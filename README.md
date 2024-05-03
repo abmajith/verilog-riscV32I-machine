@@ -412,39 +412,50 @@ type except for fence and system instructions *EBREAK, ECALL*.  
 We will postpone the discussion of the system and fence call as much as possible!
 
 
-**Store S-type Instructions**
+**Load and Store Instructions**
+*RV32I* is 32-bit address space that is byte-addressed, (i.e a 32-bit address will point to a byte memory). 
+In *RV32I*, all the arithmetic instructions only operates on CPU registers(*X0 to X31, PC*), never on the memory.
+
+-**Store S-type Instructions**
 It has 3 variants, they are 
 ```
 SB, SH, SW
 ```
-It represents store byte, store halfword, and store word respectively. 
+It represents *store byte*, *store halfword*, and *store word* respectively.  <br />
 
-Usage:  *SB X3 Offset(X4)*, adds the 12 bits signed offset value to the 
-register *X4* to point a 32-bit target address, and 
-store a byte from register memory X3 to the target address. <br />
-Similarly *SH X3 Offset(X4)* and *SW X3 Offset(X4)*. 
+*Byte* store instruction: *SB rs2 Offset(rs1)*, target memory address computed by adding 
+the 12-bit signed offset value (from the immediate field in *S* instruction) to the 
+register and store the*least significant register byte* from register address *rs2* to the target address. <br />
 
-**Load I-type instructions**
+*Halfword* store instruction *SH rs2 Offset(rs1)* stores two *least significant register byte* from the register address *rs2* 
+to the memory address *m,m+1*, where *m* is address, computed by adding 
+12-bit signed offset value (from immediate field) to the value in register address *rs1*, 
+the order in which these two bytes stored in memory address *m,m+1* depends on the 
+*endian* configuration. 
+For example in *little-endian* configuration, *least significant register byte* stored in memory *m* and 
+the second *least significant register byte* stored in memory *m+1* <br />
+
+*Word* store instruction *SW rs2 Offset(rs1)* stores value from register address *rs2* 
+to the memory address *m,m+1,m+2,m+3*, where *m* calcuated as before. <br />
+
+-**Load I-type instructions**
 It has 5 variants, which are
 
 ```
 LB, LBU, LH, LHU, LW
 ```
-It represents load byte, load byte unsigned, load halfword, 
-load halfword unsigned, and load word respectively.
+It represents *load byte*, *load byte unsigned*, *load halfword*, 
+*load halfword unsigned*, and *load word* respectively. <br />
 
-Usage: *LB X3, Offset(X4)* loads a signed byte from memory to register *X3* 
-with sign-extending it to fill 32-bit register *X3*, the source memory address 
-is calculated by adding a 12-bit signed offset value with register *X4*. <br />
-Note: this offset is extracted from *immediate field* constant value using 
-*Simm* structure. <br />
-
-Similarly, *LBU X3, Offset(X4)* with zero-extending it to fill the 32 bit register *X3* <br /> 
-*LH X3, Offset(X4)* loading 16 bits from memory into a register, sign-extending it to fill 
-the 32 bit register *X3*, <br />
-*LHU X3 Offset(X4)* loading 16 bits from memory into register, zero-extending 
-it to fill the 32 bit register *X3*,<br /> 
-*LW X3 Offset(X4)* loading 16 bits from memory into a register, 
+*Byte* load instruction: *LB rd, Offset(rs1)* loads a signed byte from memory to register address *rd* 
+with sign-extending it to fill leading bit values in the register address *rd*, the source memory address 
+is calculated by adding a 12-bit signed offset value (from immediate field in *I* instruction) 
+with value in register address *rs1*. <br />
+*Byte unsigned* load instruction: *LBU rd, Offset(rs1)* same as before, except, leading bits are filled with zero. <br /> 
+*Halfword* load instruction: *LH rd, Offset(rs1)* loading 2 bytes from memory *m,m+1* into a register, sign-extending it to fill 
+the leading bits value in register address *rd*, memory address *m* is computed by adding *Offset* value with the value in register address *rs1* <br />
+*Halfword unsigned* load instruction: *LHU rd Offset(rs1)* same as *LH* except, zero-filling in the lead bits value in register address *rd*,<br /> 
+*LW rd Offset(rs1)* loading 4 bytes from memory *m,m+1,m+2,m+3* into register address *rd*, *m* is computed as before, 
 here we do not have to worry about leading signed bit!<br />
 
 **Jump and Branch B-type Instructions**
@@ -471,8 +482,8 @@ if data in *X1* and *X2* are equal, then *BEQ* will execute
 the branching protocol, otherwise, *PC* increments normally 
 and continue its execution process. 
 
-If it decides to do a branch, it first computes the target code 
-memory address and loads it into the *PC*. This is done by
+If it decides to do a branch, it first computes the target 
+memory code address and loads it into the *PC*. This is done by
 extracting offset from *immediate field* (by the procedure *Bimm*), 
 and adding an offset value to *PC* (i.e. relative branching). Note for branching, 
 it does not want to save the return address, because it is 
