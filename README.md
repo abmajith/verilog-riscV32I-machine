@@ -32,8 +32,6 @@ Here will go through how a particular base *RV32I* *RISC-V* 32-bit Integer Instr
 constructed, and then proceed to implement it in *Verilog* code. 
 
 
-<a href="https://example.com" class="custom-link">Custom Text</a>
-
 This document is created with reference document **The RISC-V Instruction Set Manual, 
 Volume I: Unprivileged ISA**
 <a href="https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf" class="custom-link">Riscv reference manual</a>.
