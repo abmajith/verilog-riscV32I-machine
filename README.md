@@ -61,14 +61,13 @@ procedure calls and returns.
 **Data Transfer Instructions** move data within registers or performing operations 
 on data within registers.
 
-**Immediate Instructions** special type instructions (difficult to understand at first, 
-once we understand the instruction encoding scheme, it is quite straight forward) 
-perform on the instruction itself (part of data extracted from the instruction encoding).
+**Immediate Instructions** special type instructions perform on the instruction 
+itself (the part of 32-bit instruction is an operand).
 
 **Shift Instructions** logical and arithmetic shifts on register data.
 
 **Comparison Instructions** Comparing register data or register data with immediate 
-value (part of data extracted from instructions).
+value (part of 32-bit instructions field).
 
 
 If we classify these instructions based on the encoding scheme, 
