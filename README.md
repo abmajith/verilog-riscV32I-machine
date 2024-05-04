@@ -145,9 +145,9 @@ Instruction type                 | encoding format
 **R-type** (Register Type)       |  *Funct7     rs2   rs1 Funct3 rd          Opcode* 
 **I-type** (Immediate Type)      |  *imm[11:0]        rs1 Funct3 rd          Opcode* 
 **S-type** (Store Type)          |  *imm[11:5]  rs2   rs1 Funct3 imm[4:0]    Opcode* 
-**B-type** (Branch Type)         |  *imm[12|10:5] rs2 rs1 Funct3 imm[4:1|11] Opcode* 
+**B-type** (Branch Type)         |  *imm[12\10:5] rs2 rs1 Funct3 imm[4:1\11] Opcode* 
 **U-type** (Upper Immediate Type)|  *imm[31:12]                  rd          Opcode* 
-**J-type** (Jump Type)           |  *imm[20|10:1|11|19:12]       rd          Opcode* 
+**J-type** (Jump Type)           |  *imm[20\10:1\11\19:12]       rd          Opcode* 
 
 
 So far, we know rs2, rs1, and rd are Register fields in the encoding scheme, 
