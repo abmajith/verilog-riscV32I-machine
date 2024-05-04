@@ -8,4 +8,4 @@ by John Catsoulis and "Programming Embedded Systems" by Michael Barr.
 Let's start discussing, a picture is worth a thousand words, 
 
 
-<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/archBasicPicture.jpg" alt="J" width="200"/>
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/archBasicPicture.jpg" alt="J" width="800"/>
