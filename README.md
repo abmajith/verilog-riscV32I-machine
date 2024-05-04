@@ -31,13 +31,7 @@ within the processor.
 Here will go through how a particular base *RV32I* *RISC-V* 32-bit Integer Instruction set 
 constructed, and then proceed to implement it in *Verilog* code. 
 
-User
-<style>
-.custom-link {
-    text-decoration: none;
-    color: blue; /* or any other color you prefer */
-}
-</style>
+
 <a href="https://example.com" class="custom-link">Custom Text</a>
 
 This document is created with reference document **The RISC-V Instruction Set Manual, 
