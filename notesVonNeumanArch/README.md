@@ -29,3 +29,20 @@ In this memory-mapped I/O address space, the block of memory and I/O devices cou
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/addressspacemmio.jpg" alt="J" width="800"/>
 
 
+**Processor**
+A *processor* sometimes also known as a *CPU* (Central Processing Unit), its main functionality is
+the reading sequence of instructions from the code block (in the memory region), decoding it, execute it, and store it in
+its register or write in *memory* (also I/O blocks).
+
+**Memory**
+In a Von Neumann architecture, the same *memory* space is used to store program instructions and data
+manipulated by the *processor*. The memory is never empty, it always contains something,
+whether it be instructions, meaningful data, or random garbage.
+
+Usually, in the system organization, the instructions for the application are kept in a read-only memory region,
+so that the processor sequentially reads instructions and executes them. This memory space does not change during the program execution.
+The rest of the memory space is used for storing dynamic data, including variables, arrays, and any other data      
+structures needed for the application. This portion of memory is read from and written to by the *processor*
+as the program executes, and its contents may change over time. 
+
+**Buses**
