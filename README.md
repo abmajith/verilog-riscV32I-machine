@@ -86,7 +86,7 @@ base format.
 Quiz: How many bits are needed to address these 32 registers?: Ans: 5.
 
 Let's introduce these general-purpose registers in Verilog
-```
+```verilog
 ...
 reg [31:0] GenRegBanks_X [31:0];  // memory for general purpose registers
 reg [31:0] GenReg_PC;             // memory for program counter register
