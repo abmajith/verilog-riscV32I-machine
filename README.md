@@ -555,6 +555,7 @@ chip select signals to select the memory device to begin accessing and other sig
 
 
 I know it is a lot to digest at first, but for the detailed picture and discussion one could refer to 
-intellectual academics and open-source material, I wrote a short description on the page
- <a href="https://github.com/abmajith/verilog-riscV32I-machine?tab=readme-ov-file" class="custom-link">Short Notes on Von-Neuman Architecture</a>
+intellectual academics and open-source material, I wrote a short description on the page 
+<a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/notesVonNeumanArch" 
+ 		class="custom-link">Short Notes on Von-Neuman Architecture</a>
 (*Von Neuman*, pronounced as F'n-Noy-mon) if it helps. 
