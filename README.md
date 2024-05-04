@@ -5,27 +5,51 @@
 making a cookbook for the instruction sets and its verilog implementation procedure*
 
 *RISC-V* (say risk-five) is an open-source instruction set architecture (*ISA*)
-based on *RISC* (reduced instruction set computing). Here will go through
-how (and not why) a particular base *RV32I* (*RISC-V* 32-bit Integer Instruction set)
-constructed, so that we can proceed to implement a Verilog instruction simulation circuit.
-We will discover on why part (well for mostly simplicity and respective hardware
-implementation) after going through how *RV32I* encoded and know how to implement
-them in a Verilog simulator and possibly in an FPGA board.
+based on *RISC* (reduced instruction set computer). 
+
+
+The basic philosophy behind *RISC* is 
+to move the maximum complexity from the silicon to the language compilier 
+(assembly code writer). The hardware (development and design) is kept as simple 
+and fast as possible  (i.e simplify the instruction, with the effect of 
+increasing the complexity in writing the assembly programs!).
+
+For an example, one can have a *clear* instruction in their instruction set, 
+to clear one of its general purpose register bank (*reg0*), the same operation can be met by 
+doing *xor* operation (*reg0 ^ reg0*). Thus the separate *clear* instruction is no longer required.
+
+
+Well, this sort of simplicity in the instruction design increase the total 
+number of instructions writen for the user application, but greatly 
+reduce the complexity of the instruction decode unit in the silicon (processor), 
+faster instruction execution, and also reduces the size and power consumption.
+
+One another key features in *RISC* processor is that it access and transfer data 
+via only load and store instructions, all other operations solely performed 
+within the processor.
+
+Here will go through how a particular base *RV32I* *RISC-V* 32-bit Integer Instruction set 
+constructed, and then proceed to implement it in *Verilog* code. 
+
+User
+<style>
+.custom-link {
+    text-decoration: none;
+    color: blue; /* or any other color you prefer */
+}
+</style>
+<a href="https://example.com" class="custom-link">Custom Text</a>
 
 This document is created with reference document **The RISC-V Instruction Set Manual, 
-Volume I: Unprivileged ISA** Use the [Riscv reference manual] (https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf).
-
+Volume I: Unprivileged ISA** Use the  [Riscv reference manual] (https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf).
 
 There are four *RISC-V ISA* base architectures, 
 *RV32I*, *RV32E* (embeded version of RV32I for energy constraint), *RV64I*, *RV128I*.
 
-*RV32I* it is just a biggining for understanding other *RISC-V ISA* base and extensions. 
-Furthermore, all these base instruction set support integer arithmetic. 
+*RV32I* it is a gateway to understand other *RISC-V ISA* bases and extensions 
+(yes, there are multiple extensions). 
+All these base instruction sets support integer arithmetic (*and, or, xor, add, sub, shift right, shift left*). 
 It does not support floating point arithmetic or integer multiplication/division. 
-
-
-*RV32I* contains 40 unique instructions, though can be reduced to 38 instructions 
-for a simple implementation.
 
 
 *RV32I* Instruction set can be classified into 7 classes (in a simple human-readable way), they are
