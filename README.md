@@ -565,5 +565,5 @@ refer to intellectual academic journals and open-source material.
 
 I wrote a short description on the page 
 <a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/notesVonNeumanArch" 
- 		class="custom-link">Short Notes on Von-Neuman Architecture</a>
+ 		class="custom-link">Short Notes on Von-Neuman Architecture with Verilog Simulation</a>
 (*Von Neuman*, pronounced as F'n-Noy-mon) if it helps. 
