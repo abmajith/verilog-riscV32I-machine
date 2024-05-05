@@ -16,7 +16,7 @@ In a Von-Neumann architecture, the same address and data bus are used for
 reading from and writing to memory. This concept is known as memory-mapped I/O,
 where memory and I/O devices are accessed using the same address space. For example, if a processor is designed to have a 32-bit address bus, then it
 can address in the range of [0x0000 0000, 0xFFFF FFFF] in hexadecimal number,
-which is up to (*4GB* of memory).
+which is up to *4GB* of memory.
 This address space is typically divided into regions for memory and I/O devices.
 
 - Within this address space, certain ranges are reserved for memory like *RAM, ROM, Flash,*, etc.,
@@ -46,3 +46,24 @@ structures needed for the application. This portion of memory is read from and w
 as the program executes, and its contents may change over time. 
 
 **Buses**
+A *bus* is a physical group of wires or signal lines. Buses allow for the transfer 
+of electrical signals between different parts of the system and transfer information. 
+The *width* of a bus is the number of signal lines dedicated to the flow of information, 
+an 8-bit-wide bus transfers 8 bits of data in parallel.
+
+The *data bus* is bidirectional, the flow of signals (i.e. information) 
+happens in both directions, and its direction of signal flow is decided by *processor*.
+
+The *address bus* carries the address, which points to the location in memory 
+that the *processor* is attempting to access.  It is done with external circuitry.
+
+The *control bus* carries information from the *processor* about its current access state, 
+like the write or read operation. A *processor* might have some input control lines like reset, 
+interrupt lines, clock input signal, etc.
+
+The *processor* can write data to memory or an I/O device, read data from memory or 
+an I/O device, and read instructions from memory. In memory-mapped I/O, there is no difference 
+in writing to memory and I/O, and there is no difference in reading from memory 
+and I/O or reading instruction from memory.
+
+
