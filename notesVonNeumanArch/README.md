@@ -101,6 +101,50 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 		the last instruction of an *ISR* is always a *Return* from Interrupt instruction. 
 		This causes the processor to reload the saved state either from *stack* or *shadow registers*
 
+**Install Verilog and gtkwave in Ubuntu**
+I am really sorry if you using other than *Linux*!.
 
-**Memory Mapped I/O Simulation**
-Let's write a *Verilog* code to mimic the *memory-mapped I/O device*,
+To install *verilog, gtkwave*
+```bash
+#install
+sudo apt-get install iverilog gtkwave
+#test
+gtkwave --version
+iverilog -V
+```
+In other *Linux* distribution, it would be similar.
+
+**Creating Read Only Instruction memory in verilog**
+I am just writing the subset of instruction module here,
+In the subfolder (*readInstructionOnly*), 
+code *instructionMemory.v* (represents memory instruction read block), 
+*instructionMemory_tb.v* (for simulating the instructionMemory module)
+*instruction_init.hex* (a dummy sequence of instructions stored).
+
+```verilog
+module InstructionMemory # (parameter INST_WIDTH = 32, INST_DEPTH = 1024) 
+	(input wire clk, input wire [($clog2(INST_DEPTH)-1):0] rd_addr, input wire rd_en, 
+			output reg [INST_WIDTH-1:0] instruction);
+	reg [INST_WIDTH-1:0] memory [0:INST_DEPTH-1]; // setting up the required memory
+
+	// This can't be synthesizable, but its here for just simulation
+	// Letter will see how to write a synthesizable code, so that it can be tested on real hardware
+	initial begin
+		$readmemh("instruction_init.hex", memory);
+	end
+	// read triggered by positve edge of clock and readEnable signal
+	always @ (posedge clk) begin
+		if (rd_en) begin
+			instruction <= (rd_addr < INST_DEPTH) ? memory[rd_addr] : 0;
+		end
+	end
+endmodule
+```
+
+```bash
+iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
+# will store simulation result in file 'InstructionMemory_tb.vcd'
+#run the following, and navigate the generated file, and clicking the chosen file
+#insert the varibles, zoom out, you can see the simulation result in signal form
+gtkwave
+```
