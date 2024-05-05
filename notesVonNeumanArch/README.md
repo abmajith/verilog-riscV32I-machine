@@ -24,6 +24,7 @@ This address space is typically divided into regions for memory and I/O devices.
 - Each memory location and I/O device is assigned a unique address within the address space.
 - Not all addresses in the address space are necessarily mapped to valid memory or I/O devices.
   Some portions of address space may be left unused.
+  Its not common in computer systems to have as much physical memory as the address space allows for.
 
 In this memory-mapped I/O address space, the block of memory and I/O devices could be seen as 
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/addressspacemmio.jpg" alt="J" width="800"/>
@@ -62,7 +63,6 @@ an I/O device, and read instructions from memory. In memory-mapped I/O, there is
 in writing to memory and I/O, and there is no difference in reading from memory 
 and I/O or reading instruction from memory.
 
-TODO: here show some simple verilog code for transferring the data back and front
 
 
 **Processor**
@@ -102,4 +102,5 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 		This causes the processor to reload the saved state either from *stack* or *shadow registers*
 
 
-TODO: here show some simple alu operations
+**Memory Mapped I/O Simulation**
+Let's write a *Verilog* code to mimic the *memory-mapped I/O device*,
