@@ -558,10 +558,10 @@ Data is read from memory into the processor or written from the processor into m
 
 
 
-It is a lot to digest, it is important to have a global computing architecture and working principle 
-to organize our thoughts and develop organized software. 
-For a detailed picture and discussion about processors and their architecture, 
-it is important to have a habit of referring to intellectual academic journals and open-source material.
+It is a lot to digest, it is important to have a global computing architecture and working principle
+to organize our thoughts and develop organized software.
+For a detailed picture and discussion about processors and their architecture 
+refer to intellectual academic journals and open-source material.
 
 I wrote a short description on the page 
 <a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/notesVonNeumanArch" 
