@@ -102,9 +102,10 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 		This causes the processor to reload the saved state either from *stack* or *shadow registers*
 
 **Install Verilog and gtkwave in Ubuntu**
-I am really sorry if you using other than *Linux*!.
+I am sorry if you are using other than *Linux*! OS. I never had an opportunity to run other 
+*OS* besides watching movies with my friends on their computers.
 
-To install *verilog, gtkwave*
+To install *Verilog, gtkwave*
 ```bash
 #install
 sudo apt-get install iverilog gtkwave
@@ -112,12 +113,12 @@ sudo apt-get install iverilog gtkwave
 gtkwave --version
 iverilog -V
 ```
-In other *Linux* distribution, it would be similar.
+In other *Linux* distributions, it would be similar.
 
-**Creating Read Only Instruction memory in verilog**
-I am just writing the subset of instruction module here,
-In the subfolder (*readInstructionOnly*), 
-code *instructionMemory.v* (represents memory instruction read block), 
+**Creating Read Only Instruction memory in Verilog**
+I am just writing the subset of the read-only memory module here,
+In the subfolder (*readInstructionOnly*),
+code *instructionMemory.v* (represents memory instruction read block),
 *instructionMemory_tb.v* (for simulating the instructionMemory module)
 *instruction_init.hex* (a dummy sequence of instructions stored).
 
@@ -143,8 +144,8 @@ endmodule
 
 ```bash
 iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
-# will store simulation result in file 'InstructionMemory_tb.vcd'
-#run the following, and navigate the generated file, and clicking the chosen file
-#insert the varibles, zoom out, you can see the simulation result in signal form
+# will store the simulation result in file 'InstructionMemory_tb.vcd'
+#run gtkwave, navigate the generated file, and click the file
+#insert clk, address, rd_en, zoom out, there is your simulation result in signal form
 gtkwave
 ```
