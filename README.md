@@ -47,25 +47,26 @@ It does not support floating point arithmetic or integer multiplication/division
 
 *RV32I* Instruction set can be classified into 7 classes (in a simple human-readable way), they are
 
-**Arithmetic Instructions** like addition, subtraction, and logical bitwise operations.
+- **Arithmetic Instructions** like addition, subtraction, and logical bitwise operations.
 
-**Load and Store Instructions** deals with loading data from memory to register, 
-and store data from register to memory area.
+- **Load and Store Instructions** deals with loading data from memory to register, 
+	and store data from register to memory area.
 
-**Control Transfer Instructions** deal with the flow of the program, they are conditional 
-(think of if else statement operations on register values), unconditional (strict jump), 
-procedure calls and returns. 
+- **Control Transfer Instructions** deal with the flow of the program, they are conditional 
+	(think of if else statement operations on register values), unconditional (strict jump), 
+	procedure calls and returns. 
 
-**Data Transfer Instructions** move data within registers or performing operations 
-on data within registers.
+- **Data Transfer Instructions** move data within registers or performing operations 
+	on data within registers.
 
-**Immediate Instructions** special type instructions perform on the instruction 
-itself (the part of 32-bit instruction is an operand).
+- **Immediate Instructions** special type instructions perform on the instruction 
+	itself (the part of 32-bit instruction is an operand).
 
-**Shift Instructions** logical and arithmetic shifts on register data.
+- **Shift Instructions** logical and arithmetic shifts on register data.
 
-**Comparison Instructions** Comparing register data or register data with immediate 
-value (part of 32-bit instructions field).
+- **Comparison Instructions** Comparing register data or register data with immediate 
+	value (part of 32-bit instructions field).
+
 
 
 If we classify these instructions based on the encoding scheme, 
@@ -117,16 +118,21 @@ address *rd1, rd2* respectively, and [31:25] represents *funct7*.
 **Encoding Scheme**
 In the *RV32I* instructions set, the encoding scheme is quite regular and it simplifies
 the decoding and circuit construction for the hardware designer.
-Let's break down the basic encoding scheme and fields in the 32-bit instructions. <br />
-**Opcode Field** 7 bits subfield, specifying the general category of the instruction,
-always resides at 7 LSBs of the instruction. <br />
-**Funct3 Field** 3 bits subfield, providing additional information within certain
-instruction categories (like differentiating between load, and store on arithmetic operations). <br />
-**Funct7 Field** 7 bits subfield, used for extended arithmetic operations in certain instructions. <br />
-**Immediate Field** subfield length varies depending on the instruction
-(20 bits and 12 bits subfields are the most common ones), used for specifying immediate values (constant) in immediate instructions. <br />
-**Register Fields** Typically two or three fields of 5 bits wide,
-addressing 32 general-purpose registers. <br />
+Let's break down the basic encoding scheme and fields in the 32-bit instructions.
+- **Opcode Field** 7 bits subfield, specifying the general category of the instruction,
+	always resides at 7 LSBs of the instruction. <br />
+
+- **Funct3 Field** 3 bits subfield, providing additional information within certain
+	instruction categories (like differentiating between load, and store on arithmetic operations).
+
+- **Funct7 Field** 7 bits subfield, used for extended arithmetic operations in certain instructions. <br />
+
+- **Immediate Field** subfield length varies depending on the instruction
+	(20 bits and 12 bits subfields are the most common ones), used for specifying 
+	immediate values (constant) in immediate instructions.
+
+- **Register Fields** Typically two or three fields of 5 bits wide,
+	addressing 32 general-purpose registers.
 
 
 *Opcode field* is always assured to be present in the 7 LSBs bits of instruction, unlike *Funct3,
@@ -208,34 +214,32 @@ Opcode Value | represents | meaning, instruction type        |  calculation
 
 
 - *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value (as *Uimm*) into 
-		  		the rd addressed register data.
-				- For example, *LUI X5 0x12345*,  it loads the 20 bits MSB of instruction encoding 
-					(i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*. 
-				- Instruction Encoding *imm[31:12](=0x12345) rd(=&X5) 0110111*.
+   the rd addressed register data.
+	- For example, *LUI X5 0x12345*,  it loads the 20 bits MSB of instruction encoding 
+	 (i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*. 
+    - Instruction Encoding *imm[31:12](=0x12345) rd(=&X5) 0110111*.
 
 - *AUIPC* Add upper immediate to *PC*, a *U-Type* instruction to add 20 bits wide constant value 
-		 			(as *Uimm*) with *PC* value, 
-				- For example, *AUIPC X5 0x10000*, it adds the 20 bits MSB of *AUIPC* 
-					instruction encoding (i.e *imm[31:12] = 0x10000*) with *PC* value and stores it in *X5* register.
-				- Instruction Encoding *imm[31:12](=0x10000) rd(=&X5) 0010111*
+   (as *Uimm*) with *PC* value, 
+	- For example, *AUIPC X5 0x10000*, it adds the 20 bits MSB of *AUIPC* 
+	 instruction encoding (i.e *imm[31:12] = 0x10000*) with *PC* value and stores it in *X5* register.
+	- Instruction Encoding *imm[31:12](=0x10000) rd(=&X5) 0010111*
 		 	
 - *JAL*: Jump and Link, a *J-type* instruction to add 20 bits signed offset 
-		 			(as *Jimm*) with *PC* register data.
-		 		- For example, *JAL X6 offset*, it performs *X6 = PC + 4*, 
-					followed by *PC = PC + Jimm* 
-				- i.e it store the return address in *X6*, and jump into the target address 
-					with relative distance denoted in *Jimm*
-				- Instruction Encoding *imm[20|10:1|11|19:12]  rd(=&X6) 1101111*, 
-					where *offset* is expanded from *imm* using *Jimm* structure.
+   (as *Jimm*) with *PC* register data.
+	- For example, *JAL X6 offset*, it performs *X6 = PC + 4*, followed by *PC = PC + Jimm* 
+	- i.e it store the return address in *X6*, and jump into the target address 
+	   with relative distance denoted in *Jimm*
+	- Instruction Encoding *imm[20|10:1|11|19:12]  rd(=&X6) 1101111*, 
+	  where *offset* is expanded from *imm* using *Jimm* structure.
 
 - *JALR*: Jump and Link Register, to add 12 bits signed offset ( as *Iimm*) 
-		 				with *PC* register data. 
-				- For example, *JALR X2 X1, offset*, it performs *X2 = PC + 4*, 
-					followed by *PC = X1 + Iimm*
-				- i.e it store the return address in *X2*, and then jump to the 
-					relative address denoted in *X1 + Iimm*
-				- Instruction Encoding *imm[11:0] rs1(=&X1) 000 rd(=&X2) 1100111*, 
-					where *offset* is expanded from *imm* using *Iimm* structure.
+   with *PC* register data. 
+	- For example, *JALR X2 X1, offset*, it performs *X2 = PC + 4*, followed by *PC = X1 + Iimm*
+	- i.e it store the return address in *X2*, and then jump to the 
+	   relative address denoted in *X1 + Iimm*
+	- Instruction Encoding *imm[11:0] rs1(=&X1) 000 rd(=&X2) 1100111*, 
+	  where *offset* is expanded from *imm* using *Iimm* structure.
 
 - Branch instructions: there are 6 variants on conditional jumps, 
 		 		that depends on a test on two registers
@@ -306,47 +310,48 @@ But we have 10 *R-Type* arithmetic instructions. The second most significant bit
 to decide an instruction along with *funct3*. Bit 5 of *funct7* encodes *ADD/SUB* and *SRA/SRL*. 
 
 Let's list the *arithmetic R-type instructions* usage example here
-- ADD X3 X1 X2, adds the value in registers *X1,X2* and 
-		store the result in register X3
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 000 rd(=&X3) 0110011*
+- ADD X3 X1 X2, adds the value in registers *X1,X2* and store the result in register X3
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 000 rd(=&X3) 0110011*
 
 - SUB X3 X1 X2, substracts the value in register *X2* from the value 
-		in register *X1* and stores in register *X3*
-		- Instruction Encoding: *0100000 rs2(=&X2) rs1(=&X1) 000 rd(=&X3) 0110011*
+  in register *X1* and stores in register *X3*
+	- Instruction Encoding: *0100000 rs2(=&X2) rs1(=&X1) 000 rd(=&X3) 0110011*
 
 - SLL X3 X1 X2, (shift left logical) shifts the value in the register *X1* 
-		left by the number of bits specified in register *X2* (only 5 LSBs matters here) and stores in register *X3*
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 001 rd(=&X3) 0110011*
+  left by the number of bits specified in register *X2* (only 5 LSBs matters here) and stores in register *X3*
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 001 rd(=&X3) 0110011*
 
 - SLT X3 X1 X2, (set less than) sets the register *X3* to 1 
-		if the value in register *X1* is less than the value in register *X2*, otherwise 0
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 010 rd(=&X3) 0110011*
+	if the value in register *X1* is less than the value in register *X2*, otherwise 0
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 010 rd(=&X3) 0110011*
 
 - SLTU X3 X1 X2, (set less than unsigned) sets the register *X3* to 1 if the value 
-		in register *X1* is less than the value in register *X2*, otherwise 0
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 011 rd(=&X3) 0110011*
+  in register *X1* is less than the value in register *X2*, otherwise 0
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 011 rd(=&X3) 0110011*
 
 - XOR X3 X1 X2, (bitwise *xor*) sets the register *X3* 
-		the result of *xor* operation on the value of registers *X1,X2*.
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 100 rd(=&X3) 0110011*
+  the result of *xor* operation on the value of registers *X1,X2*.
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 100 rd(=&X3) 0110011*
 
 - SRL X3 X1 X2, (shift right logical) shifts the value in the register *X1* 
-		by the number of bits specified in register *X2* (only 5 LSBs matters here) 
-		and stores in register *X3*, by doing right shift logical, 
-		it will fill the leading values by zero i.e zero-fill
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 101 rd(=&X3) 0110011*
+	by the number of bits specified in register *X2* (only 5 LSBs matters here) 
+	and stores in register *X3*, by doing right shift logical, 
+	it will fill the leading values by zero i.e zero-fill
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 101 rd(=&X3) 0110011*
 
 - SRA X3 X1 X2, (shift right arithmetic) shifts the value in the register 
-		*X1* by the number of bits specified in register *X2* (only 5 LSBs matters here) 
-		and stores in register *X3*, by doing right shift arithmetic, 
-		it will fill the leading values by signed value i.e *X1[31]* msb of *X1* value.
-		- Instruction Encoding: *0100000 rs2(=&X2) rs1(=&X1) 101 rd(=&X3) 0110011*
+	*X1* by the number of bits specified in register *X2* (only 5 LSBs matters here) 
+	and stores in register *X3*, by doing right shift arithmetic, 
+	it will fill the leading values by signed value i.e *X1[31]* msb of *X1* value.
+	- Instruction Encoding: *0100000 rs2(=&X2) rs1(=&X1) 101 rd(=&X3) 0110011*
+
 - OR X3 X1 X2, (bitwise *or*) sets the register *X3* the result of *or* 
-		operation on the value of registers *X1, X2*.
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 110 rd(=&X3) 0110011*
+	operation on the value of registers *X1, X2*.
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 110 rd(=&X3) 0110011*
+
 - AND X3 X1 X2, (bitwise *and*) sets the register *X3* the result of *and* 
-		operation on the value of registers *X1, X2*.
-		- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 111 rd(=&X3) 0110011*
+	operation on the value of registers *X1, X2*.
+	- Instruction Encoding: *0000000 rs2(=&X2) rs1(=&X1) 111 rd(=&X3) 0110011*
 
 As mentioned earlier *opcode* is the same for all the *arithmetic R-type instruction*.
 *funct3* code is same for *SRL,SRA*, it is distinquished by the *funct7* code, 
@@ -532,28 +537,33 @@ register bank, and the control logic.
 - Instructions are fetched from memory, decoded, and executed within the processor core.
 
 **Memory Architecture**
--The memory architecture includes different types of memory:    
-		- Instruction Memory block: a read-only memory area, that stores the program instructions.    
-		- Data Memory block: a read-and-write data memory area, to work on the program instructions
+- The memory architecture includes different types of memory:    
+- Instruction Memory block: a read-only memory area, that stores the program instructions.    
+- Data Memory block: a read-and-write data memory area, to work on the program instructions
 - Both instruction and data memories are accessed using the memory address generated by the processor.
 
--**Address and Data buses**    
+**Address and Data buses**    
 - The processor communicates with memory address and data buses.    
 - The address bus carries memory addresses generated by the processor to 
-select specific locations in memory.    
+  select specific locations in memory.    
 - The data bus carries data between the processor and memory. 
 Data is read from memory into the processor or written from the processor into memory.
 
-- **Control Signals**       
+**Control Signals**       
 - Control signals are generated by the processor to coordinate memory access 
-(like selecting read or write data into memory, or read the instruction) and other operations.      
+	(like selecting read or write data into memory, or read the instruction) and other operations.      
 - Control signals include read/write signals to indicate the direction of data transfer, 
-chip select signals to select the memory device to begin accessing and other signals for synchronization and timing purposes.
+  chip select signals to select the memory device to begin accessing and 
+	other signals for synchronization and timing purposes.
 
 
 
-I know it is a lot to digest at first, but for the detailed picture and discussion one could refer to 
-intellectual academics and open-source material, I wrote a short description on the page 
+It is a lot to digest, it is important to have a global computing architecture and working principle 
+to organize our thoughts and develop organized software. 
+For a detailed picture and discussion about processors and their architecture, 
+it is important to have a habit of referring to intellectual academic journals and open-source material.
+
+I wrote a short description on the page 
 <a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/notesVonNeumanArch" 
  		class="custom-link">Short Notes on Von-Neuman Architecture</a>
 (*Von Neuman*, pronounced as F'n-Noy-mon) if it helps. 
