@@ -127,12 +127,17 @@ code *instructionMemory.v* (represents memory instruction read block),
 
 ```verilog
 module InstructionMemory # (parameter INST_WIDTH = 32, INST_DEPTH = 1024) 
-	(input wire clk, input wire [($clog2(INST_DEPTH)-1):0] rd_addr, input wire rd_en, 
-			output reg [INST_WIDTH-1:0] instruction);
+	(
+	input wire clk, 
+	input wire [($clog2(INST_DEPTH)-1):0] rd_addr, 
+	input wire rd_en, 
+	output reg [INST_WIDTH-1:0] instruction
+	);
+	
 	reg [INST_WIDTH-1:0] memory [0:INST_DEPTH-1]; // setting up the required memory
 
 	// This can't be synthesizable, but its here for just simulation
-	// Letter will see how to write a synthesizable code, so that it can be tested on real hardware
+	// Later will see how to write a synthesizable code,
 	initial begin
 		$readmemh("instruction_init.hex", memory);
 	end
@@ -161,15 +166,23 @@ as well as *write enable* signal.
 The code is available in the subfolder (*readwriteMemory*),  simulation procedure is same as before. 
 ```verilog
 module ReadWriteMemory #( parameter DATA_WIDTH = 32,parameter DATA_DEPTH = 1024) 
-	(input wire clk,
-	input wire [($clog2(DATA_DEPTH)-1):0] addr, input wire rd_en, input wire wr_en,
-		input wire [DATA_WIDTH-1:0] write_data, output reg [DATA_WIDTH-1:0] read_data);
+	(
+	input wire clk,
+	input wire [($clog2(DATA_DEPTH)-1):0] addr, 
+	input wire rd_en, input wire wr_en,
+	input wire [DATA_WIDTH-1:0] write_data, 
+	output reg [DATA_WIDTH-1:0] read_data
+	);
+	
 	reg [DATA_WIDTH-1:0] memory [0:DATA_DEPTH-1];
+
+	// writing into memory
 	always @ (posedge clk) begin
 		if (wr_en && (addr < DATA_DEPTH)) begin
 			memory[addr] <= write_data;
 		end
 	end
+	// reading from memory
 	always @ (posedge clk) begin
 		if (rd_en && (addr < DATA_DEPTH)) begin
 			read_data <= memory[addr];
@@ -181,3 +194,6 @@ endmodule
 For both above examples on this page, I avoided the comments for the module and various lines,
 in the folder file, I wrote code with a good number of comments.
 Also when you follow the simulation, you will see the typical and importance of simulation.
+
+**Creating Addressable I/O Device in Verilog**
+
