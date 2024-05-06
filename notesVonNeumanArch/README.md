@@ -115,7 +115,10 @@ iverilog -V
 ```
 In other *Linux* distributions, it would be similar.
 
-**Creating Read Only Instruction memory in Verilog**
+To have short and effective tutorial on *Verilog* one can follow 
+<a href="https://www.chipverify.com/tutorials/verilog" class="custom-link">this tutorial</a>.
+
+**Creating Read Only Instruction Memory in Verilog**
 I am just writing the subset of the read-only memory module here,
 In the subfolder (*readInstructionOnly*),
 code *instructionMemory.v* (represents memory instruction read block),
@@ -141,6 +144,7 @@ module InstructionMemory # (parameter INST_WIDTH = 32, INST_DEPTH = 1024)
 	end
 endmodule
 ```
+Note: In the created module, each addressable memory has 32-bit data not 8-bit data.
 
 ```bash
 iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
@@ -149,3 +153,31 @@ iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
 #insert clk, address, rd_en, zoom out, there is your simulation result in signal form
 gtkwave
 ```
+
+**Creating Read and Write Data Memory in Verilog**
+In this *Verilog* module, we have to provide *wire* for providing the data to write in the memory, 
+as well as *write enable* signal. 
+
+The code is available in the subfolder (*readwriteMemory*),  simulation procedure is same as before. 
+```verilog
+module ReadWriteMemory #( parameter DATA_WIDTH = 32,parameter DATA_DEPTH = 1024) 
+	(input wire clk,
+	input wire [($clog2(DATA_DEPTH)-1):0] addr, input wire rd_en, input wire wr_en,
+		input wire [DATA_WIDTH-1:0] write_data, output reg [DATA_WIDTH-1:0] read_data);
+	reg [DATA_WIDTH-1:0] memory [0:DATA_DEPTH-1];
+	always @ (posedge clk) begin
+		if (wr_en && (addr < DATA_DEPTH)) begin
+			memory[addr] <= write_data;
+		end
+	end
+	always @ (posedge clk) begin
+		if (rd_en && (addr < DATA_DEPTH)) begin
+			read_data <= memory[addr];
+		end
+	end
+endmodule
+```
+
+For both above examples on this page, I avoided the comments for the module and various lines,
+in the folder file, I wrote code with a good number of comments.
+Also when you follow the simulation, you will see the typical and importance of simulation.
