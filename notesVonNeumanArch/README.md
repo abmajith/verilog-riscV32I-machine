@@ -149,7 +149,11 @@ module InstructionMemory # (parameter INST_WIDTH = 32, INST_DEPTH = 1024)
 	end
 endmodule
 ```
-Note: In the created module, each addressable memory has 32-bit data not 8-bit data.
+Note: In the created module, each addressable memory has 32-bit data, not 8-bit data. As long as
+we are working with just memory region, it is okay, when we go for memory-mapped I/O,
+we have to go with a strict 8-bit data bus. It is not a wise choice to assume I/O devices 
+are also 32-bit wide in communication. We will bring the memory alignment into the design 
+when we go down the path and build a unified memory module.
 
 ```bash
 iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
@@ -196,4 +200,12 @@ in the folder file, I wrote code with a good number of comments.
 Also when you follow the simulation, you will see the typical and importance of simulation.
 
 **Creating Addressable I/O Device in Verilog**
+We are not working in real hardware, so we will simulate the behaviour of I/O devices using
+memory!. Don't worry, it wont be that dull!.
 
+- Typical Input device PushButton
+- Typical Output device Array of LED's
+- Typical Input/Output (bidirectional communication) device UART
+
+
+**Unified Memory-Mapped I/O**
