@@ -376,7 +376,7 @@ case(funct3)
 	3'b010: l_rd = ($signed(rs1) < $signed(rs2));                                 // signed less than
 	3'b011: l_rd = (rs1 < rs2);                                                   // unsigned less than
 	3'b100: l_rd = (rs1 ^ rs2);                                                   // bitwise xor
-	3'b101: l_rd = (funct7[5]) ? ($signed(rs1) >> rs2[4:0]) : (rs1 >> rs2[4:0]);  // shift right logical or arithmetic 
+	3'b101: l_rd = (funct7[5]) ? ($signed(rs1) >>> rs2[4:0]) : (rs1 >> rs2[4:0]);  // shift right logical or arithmetic 
 	3'b101: l_rd = (rs1 | rs2);					                                  // bitwise or
 	3'b111: l_rd = (rs1 & rs2);						                              // bitwise and 
 endcase
