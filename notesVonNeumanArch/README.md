@@ -4,12 +4,9 @@ This repo is about gathering short knowledge on Von-Neuman architecture,
 it is written explicitly with reference from the book "Designing Embedded Hardware" 
 by John Catsoulis and "Programming Embedded Systems" by Michael Barr.
 
-
 Let's start discussing, a picture is worth a thousand words, 
 
-
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/archBasicPicture.jpg" alt="J" width="800"/>
-
 
 
 In a Von-Neumann architecture, the same address and data bus are used for
@@ -21,7 +18,9 @@ This address space is typically divided into regions for memory and I/O devices.
 
 - Within this address space, certain ranges are reserved for memory like *RAM, ROM, Flash,*, etc.,
   while other ranges are allocated for I/O devices like *serial ports, GPIO pins, etc*.
+
 - Each memory location and I/O device is assigned a unique address within the address space.
+
 - Not all addresses in the address space are necessarily mapped to valid memory or I/O devices.
   Some portions of address space may be left unused.
   Its not common in computer systems to have as much physical memory as the address space allows for.
@@ -73,18 +72,24 @@ its register or write in *memory* (also I/O blocks). It also handles interrupts 
 Let's see some basic building blocks inside the processor and key interrupt handling.
 
 - *ALU*
-    - It is responsible for performing arithmetic and logic operations on data.
-    - Depending on the processor design, it performs addition, subtraction, multiplication, bitwise *AND*, *OR*,
+  - It is responsible for performing arithmetic and logic operations on data.
+
+  - Depending on the processor design, it performs addition, subtraction, multiplication, bitwise *AND*, *OR*,
       shift operations, comparison operations, etc.
-    - It takes input from registers or memory and provides the outputs.
+
+  - It takes input from registers or memory and provides the outputs.
 
 - *Registers*
-    - Registers are small, fast storage locations within the processor
-    - It is used for storing operands, intermediate results, and addresses.
-    - Common types are *PC* (program counter), *IR* (instruction register) holds currently fetched instruction, General-purpose
+  - Registers are small, fast storage locations within the processor
+
+  - It is used for storing operands, intermediate results, and addresses.
+
+  - Common types are *PC* (program counter), *IR* (instruction register) holds currently fetched instruction, General-purpose
       registers, *SP* stack pointer, *CSR* control and status register holds flags indicating processor status.
-    - Depending on the processor design, the existence of these registers, and register width varies a lot.
-    - Some *processors* also have *shadow registers*, which save the state of the main registers 
+
+  - Depending on the processor design, the existence of these registers, and register width varies a lot.
+
+  - Some *processors* also have *shadow registers*, which save the state of the main registers 
 	  when the processor begins servicing an interrupt. It avoids explicitly writing the 
 	  temporary register data in the *stack*.
 
@@ -93,10 +98,11 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 	from the processor, causing the processor to divert from the current 
 	execution and deal with the event that has occurred.
 
-    - When an interrupt occurs, the usual procedure is for the processor to save its state 
+  - When an interrupt occurs, the usual procedure is for the processor to save its state 
 		by pushing its registers, *PC* onto the stack or *shadow register*. 
 		The processor then loads an interrupt vector into the *PC*.
-	- The interrupt vector is the address where an interrupt service routine (*ISR*) lies. 
+
+  - The interrupt vector is the address where an interrupt service routine (*ISR*) lies. 
 		Thus loading the vector into the program counter, and beginning the execution of the ISR, 
 		the last instruction of an *ISR* is always a *Return* from Interrupt instruction. 
 		This causes the processor to reload the saved state either from *stack* or *shadow registers*
@@ -127,26 +133,26 @@ code *instructionMemory.v* (represents memory instruction read block),
 
 ```verilog
 module InstructionMemory # (parameter INST_WIDTH = 32, INST_DEPTH = 1024) 
-	(
-	input wire clk, 
-	input wire [($clog2(INST_DEPTH)-1):0] rd_addr, 
-	input wire rd_en, 
-	output reg [INST_WIDTH-1:0] instruction
-	);
+  (
+  input wire clk, 
+  input wire [($clog2(INST_DEPTH)-1):0] rd_addr, 
+  input wire rd_en, 
+  output reg [INST_WIDTH-1:0] instruction
+  );
 	
-	reg [INST_WIDTH-1:0] memory [0:INST_DEPTH-1]; // setting up the required memory
+  reg [INST_WIDTH-1:0] memory [0:INST_DEPTH-1]; // setting up the required memory
 
-	// This can't be synthesizable, but its here for just simulation
-	// Later will see how to write a synthesizable code,
-	initial begin
-		$readmemh("instruction_init.hex", memory);
-	end
-	// read triggered by positve edge of clock and readEnable signal
-	always @ (posedge clk) begin
-		if (rd_en) begin
-			instruction <= (rd_addr < INST_DEPTH) ? memory[rd_addr] : 0;
-		end
-	end
+  // This can't be synthesizable, but its here for just simulation
+  // Later will see how to write a synthesizable code,
+  initial begin
+    $readmemh("instruction_init.hex", memory);
+  end
+  // read triggered by positve edge of clock and readEnable signal
+  always @ (posedge clk) begin
+    if (rd_en) begin
+      instruction <= (rd_addr < INST_DEPTH) ? memory[rd_addr] : 0;
+    end
+  end
 endmodule
 ```
 Note: In the created module, each addressable memory has 32-bit data, not 8-bit data. As long as
@@ -170,28 +176,28 @@ as well as *write enable* signal.
 The code is available in the subfolder (*readwriteMemory*),  simulation procedure is same as before. 
 ```verilog
 module ReadWriteMemory #( parameter DATA_WIDTH = 32,parameter DATA_DEPTH = 1024) 
-	(
-	input wire clk,
-	input wire [($clog2(DATA_DEPTH)-1):0] addr, 
-	input wire rd_en, input wire wr_en,
-	input wire [DATA_WIDTH-1:0] write_data, 
-	output reg [DATA_WIDTH-1:0] read_data
-	);
+  (
+  input wire clk,
+  input wire [($clog2(DATA_DEPTH)-1):0] addr, 
+  input wire rd_en, input wire wr_en,
+  input wire [DATA_WIDTH-1:0] write_data, 
+  output reg [DATA_WIDTH-1:0] read_data
+  );
 	
-	reg [DATA_WIDTH-1:0] memory [0:DATA_DEPTH-1];
+  reg [DATA_WIDTH-1:0] memory [0:DATA_DEPTH-1];
 
-	// writing into memory
-	always @ (posedge clk) begin
-		if (wr_en && (addr < DATA_DEPTH)) begin
-			memory[addr] <= write_data;
-		end
-	end
-	// reading from memory
-	always @ (posedge clk) begin
-		if (rd_en && (addr < DATA_DEPTH)) begin
-			read_data <= memory[addr];
-		end
-	end
+  // writing into memory
+  always @ (posedge clk) begin
+    if (wr_en && (addr < DATA_DEPTH)) begin
+      memory[addr] <= write_data;
+    end
+  end
+  // reading from memory
+  always @ (posedge clk) begin
+    if (rd_en && (addr < DATA_DEPTH)) begin
+      read_data <= memory[addr];
+    end
+  end
 endmodule
 ```
 
@@ -200,12 +206,80 @@ in the folder file, I wrote code with a good number of comments.
 Also when you follow the simulation, you will see the typical and importance of simulation.
 
 **Creating Addressable I/O Device in Verilog**
-We are not working in real hardware, so we will simulate the behaviour of I/O devices using
-memory!. Don't worry, it wont be that dull!.
+We are not working in real hardware, we will simulate the behavior of I/O devices using
+memory! We will see how general-purpose input output pins can be read and written.
+The test bed code, and module code are in the sub folder name IOdevice. 
 
-- Typical Input device PushButton
-- Typical Output device Array of LED's
-- Typical Input/Output (bidirectional communication) device UART
+```verilog
+module GPIO # (
+  // parameter for setting number of sets of 8-pin parallel port
+  parameter NUM_GPIO_SETS = 4,
+  parameter GPIO_WIDTH    = 8
+) (
+  input wire clk,
+  input wire rst,
 
+  // address space for parallel ports
+  input wire [$clog2(NUM_GPIO_SETS):0] addr,
+
+  // enabling the status of the GPIO pin status and write/read data
+  input wire [GPIO_WIDTH-1:0] wr_data,
+
+  // data to read from the parallel port
+  output reg [GPIO_WIDTH-1:0] rd_data
+);
+  // to store the data signal of all GPIO's
+  reg [GPIO_WIDTH-1:0] gpio_status_data [0:(2*NUM_GPIO_SETS)-1];
+  // Note there is 2 times the num of gpio pin set.
+
+  // gpio_status_data[0,2,4,..] for setting GPIO pins read/write status
+  // gpio_status_data[1,3,5,..] for actual GPIO pins data
+
+  // initialize the data
+  initial begin
+    for (integer i = 0; i < 2*NUM_GPIO_SETS; i=i+1) begin
+      gpio_status_data[i] = 0;
+    end
+  end
+
+  // reset the mode
+  always @ (posedge clk) begin
+    if (rst) begin
+      gpio_status_data[addr] <= 0;
+    end
+  end
+
+  // setting the enable status (only write) of the GPIO pins
+  always @ (posedge clk) begin
+    if (~rst && !addr[0]) begin
+      gpio_status_data[addr] <= wr_data;
+    end
+  end
+
+  // write data on the write enabled pins, dont disturb the read pin's data
+  always @ (posedge clk) begin
+    if (~rst && addr[0]) begin // dealing with data register
+      gpio_status_data[addr] <= (( gpio_status_data[addr-1]  & wr_data)
+                                  | ( ~(gpio_status_data[addr-1]) & gpio_status_data[addr] ));
+    end
+  end
+
+  // Memory mapped I/O, reading
+  always @ (posedge clk) begin
+    if (~rst && addr[0]) begin // do reading
+      // if a pin is write mode, it will return 0 on that pin address!
+      // and never change its value on the actual register
+      rd_data <= ( ~(gpio_status_data[addr-1]) & gpio_status_data[addr]);
+    end
+  end
+
+endmodule
+```
+
+There are some other  important I/O devices, like a timer counter for generating periodic interrupt signals,
+*UART* (universal asynchronous receiver and transmitter) for a serial port transmission and receiver.
+
+We will develop these important I/O devices and their interrupt mechanism after creating a bare minimum processor, 
+aligned memory access for read-only, and read-and-write memory.
 
 **Unified Memory-Mapped I/O**
