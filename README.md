@@ -175,7 +175,7 @@ Instance Type | Immediate Field Encoding format                      
 *S-Type*      | 12 bits, sign expansion (stored in two parts)                      | *Simm*
 *B-Type*      | 12 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Bimm*
 *U-Type*      | 20 bits, into upper [31:12] and set 12 LSBs into zero              | *Uimm*
-*J-Type*	  | 20 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Jimm*
+*J-Type*	    | 20 bits, sign expansion into upper [31:1] and set 0th bit as zero  | *Jimm*
 
 
 Let's code them in Verilog to create various 32 bits of immediate constant value 
