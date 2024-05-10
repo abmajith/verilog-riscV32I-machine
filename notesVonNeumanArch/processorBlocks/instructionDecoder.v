@@ -3,19 +3,19 @@ module decode (
   input [31:0] instruction,
 
   // couple of register address to read and write
-  output       rg_we, // register write enable
+  output reg   rg_we, // register write enable
   output [5:0] rd_addr,
-  output       rg_re1 // use rs1_addr enable
+  output reg   rg_re1, // use rs1_addr enable
   output [5:0] rs1_addr,
-  output       rg_re2, // use rs2_addr enable
+  output reg   rg_re2, // use rs2_addr enable
   output [5:0] rs2_addr,
 
   // opcode 
   output [6:0] opCode,
   // func3, funct7
-  output [3:0] funct3,
+  output [2:0] funct3,
   output [6:0] funct7,
-  output [31:0] immediateExtd,
+  output reg [31:0] immediateExtd
 );
 
   // internal signals
@@ -34,13 +34,13 @@ module decode (
 
   // consistency in the placement of other fields in the instruction, makes easier to extract the details as 
   // extracting opcode, funct3, funct7
-  opCode = {instruction[6:0]};
-  funct3 = {instruction[14:12]};
-  funct7 = {instruction[31:25]};
+  assign opCode = instruction[6:0];
+  assign funct3 = instruction[14:12];
+  assign funct7 = instruction[31:25];
   // extracting register address fields 
-  rd_addr  = {instruction[11:7]};
-  rs1_addr = {instruction[19:15]};
-  rs2_addr = {instruction[24:20]};
+  assign rd_addr  = {instruction[11:7]};
+  assign rs1_addr = {instruction[19:15]};
+  assign rs2_addr = {instruction[24:20]};
   
 
   // extracting the immediate field into extended immediate format as disuccused in the documents
