@@ -124,6 +124,10 @@ In other *Linux* distributions, it would be similar.
 To have short and effective tutorial on *Verilog* one can follow 
 <a href="https://www.chipverify.com/tutorials/verilog" class="custom-link">this tutorial</a>.
 
+If someone wants solid understanding of *Verilog* syntax, and  
+what is the standard procedure for digital system design, I refer to the book
+*Verilog HDL: A Guide to Digital Design and Synthesis* by *Samir Palnitkar*.
+
 **Creating Read Only Instruction Memory in Verilog**
 I am just writing the subset of the read-only memory module here,
 In the subfolder (*readInstructionOnly*),
