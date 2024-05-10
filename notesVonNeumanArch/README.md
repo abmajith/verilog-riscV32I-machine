@@ -282,10 +282,20 @@ There are some other  important I/O devices, like a timer counter for generating
 We will develop these important I/O devices and their interrupt mechanism after creating a bare minimum processor, 
 aligned memory access for read-only, and read-and-write memory.
 
-**Unified Memory-Mapped I/O**
+**Aligned Memory**
+Note, in the earlier memory code (either read instruction only or read-write memory modules),
+modules are written in a parameter way so that we can modify the data width, address width, 
+and depth of those data areas. A valid address is mapped to the data, 
+it is parameterized to have a certain data width in that module instance.
 
-Coming Soon
+In the memory blocks, each byte should be addressable separately, not specifically 2 bytes, 
+four bytes, or 8 bytes. Memory blocks like *SRAM, RAM, ROM, flash memory, etc,* 
+are not just designed for one specific architecture style but more for a general case.
 
+So let's work on the aligned memory space module
+
+```verilog
+```
 
 **Parts of Processor**
 
