@@ -1,35 +1,31 @@
 # verilog-riscV32I-machine
 
-
-*This repo is about Learning  RISC V 32-bit integer base instructions set, 
+*This repo is about Learning  RISC V 32-bit integer base instructions set,
 making a cookbook for the instruction sets and its verilog implementation procedure*
 
 *RISC-V* (say risk-five) is an open-source instruction set architecture (*ISA*)
-based on *RISC* (reduced instruction set computer). 
+based on *RISC* (reduced instruction set computer).
 
 
-The basic philosophy behind *RISC* is 
-to move the maximum complexity from the silicon to the language compilier 
-(assembly code writer). The hardware (development and design) is kept as simple 
-and fast as possible  (i.e simplify the instruction, with the effect of 
-increasing the complexity in writing the assembly programs!).
+The basic philosophy behind *RISC* is
+to move the maximum complexity from the silicon to the language compiler (assembly code writer). 
+The hardware (development and design) is kept as simple
+and fast as possible  (i.e. simplify the instruction, with the effect of
+increasing the complexity in writing the assembly programs! complexity in the
+sense that the details in writing assembly program code).
 
-For an example, one can have a *clear* instruction in their instruction set, 
-to clear one of its general purpose register bank (*reg0*), the same operation can be met by 
+*RISC-V* instruction is simple, it is designed to have a limited number  
+of instructions and the decoding procedure to extract the information and perform accordingly.            
+For example, one can have a *clear* instruction in their instruction set,
+to clear one of its general purpose register banks (*reg0*), the same operation can be met by
 doing *xor* operation (*reg0 ^ reg0*). Thus the separate *clear* instruction is no longer required.
 
-
-Well, this sort of simplicity in the instruction design increase the total 
-number of instructions writen for the user application, but greatly 
-reduce the complexity of the instruction decode unit in the silicon (processor), 
-faster instruction execution, and also reduces the size and power consumption.
-
-One another key features in *RISC* processor is that it access and transfer data 
-via only load and store instructions, all other operations solely performed 
+Another simplicity in *RISC-V* design is that it simplifies the data access.
+It transfers data via only load and store instructions, all other operations are solely performed
 within the processor.
 
-Here will go through how a particular base *RV32I* *RISC-V* 32-bit Integer Instruction set 
-constructed, and then proceed to implement it in *Verilog* code. 
+Here will go through how a particular base *RV32I* *RISC-V* 32-bit Integer Instruction set
+constructed, and the *Verilog* code.
 
 
 This document is created with reference document **The RISC-V Instruction Set Manual, 
