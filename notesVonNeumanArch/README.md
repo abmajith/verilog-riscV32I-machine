@@ -672,4 +672,4 @@ discussed a bit about processor and memory access, without looking into the bloc
 Here, for the first time, we will draw a block diagram for a processor with various blocks like
 *memory, ALU, Register, decoder, PC, control and status register, etc.*
 
-<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/proc_internals.jpg" alt="J" width="800"/>
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/notesVonNeumanArch/proc_internals.jpg" alt="J" width="1200"/>
