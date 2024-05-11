@@ -8,14 +8,14 @@ based on *RISC* (reduced instruction set computer).
 
 
 The basic philosophy behind *RISC* is
-to move the maximum complexity from the silicon to the language compiler (assembly code writer). 
+to move the maximum complexity from the silicon to the language compiler (to assembly code writer). 
 The hardware (development and design) is kept as simple
 and fast as possible  (i.e. simplify the instruction, with the effect of
 increasing the complexity in writing the assembly programs! complexity in the
 sense that the details in writing assembly program code).
 
 *RISC-V* instruction is simple, it is designed to have a limited number  
-of instructions and the decoding procedure to extract the information and perform accordingly.            
+of instructions and the decoding procedure to extract the information.            
 For example, one can have a *clear* instruction in their instruction set,
 to clear one of its general purpose register banks (*reg0*), the same operation can be met by
 doing *xor* operation (*reg0 ^ reg0*). Thus the separate *clear* instruction is no longer required.
