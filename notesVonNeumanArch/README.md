@@ -664,3 +664,10 @@ module IV32IALU
 
 endmodule
 ```
+
+At this moment we have a module for *memory, ALU, Register, and instruction decoder*, we can proceed to build a processor
+that executes the *RV32I* base instruction set, all it has to do is bind all the modules so far created
+and make them work. The design principle we followed is called the modular and bottom-up approach. We
+discussed a bit about processor and memory access, without looking into the block diagram of a processor.
+Here, for the first time, we will draw a block diagram for a processor with various blocks like
+*memory, ALU, Register, decoder, PC, control and status register, etc.*
