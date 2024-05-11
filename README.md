@@ -563,6 +563,6 @@ For a detailed picture and discussion about processors and their architecture
 refer to intellectual academic journals and open-source material.
 
 I wrote a short description on the page 
-<a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/notesVonNeumanArch" 
+<a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/RV32I_VonNeumanArch" 
  		class="custom-link">Executing RV32I in Von-Neuman Architecture with Verilog module and test bench</a>
 (*Von Neuman*, pronounced as F'n-Noy-mon). 
