@@ -557,7 +557,6 @@ Data is read from memory into the processor or written from the processor into m
 	other signals for synchronization and timing purposes.
 
 
-
 It is a lot to digest, it is important to have a global computing architecture and working principle
 to organize our thoughts and develop organized software.
 For a detailed picture and discussion about processors and their architecture 
@@ -565,5 +564,5 @@ refer to intellectual academic journals and open-source material.
 
 I wrote a short description on the page 
 <a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/notesVonNeumanArch" 
- 		class="custom-link">Short Notes on Von-Neuman Architecture with Verilog Simulation</a>
-(*Von Neuman*, pronounced as F'n-Noy-mon) if it helps. 
+ 		class="custom-link">Executing RV32I in Von-Neuman Architecture with Verilog module and test bench</a>
+(*Von Neuman*, pronounced as F'n-Noy-mon). 
