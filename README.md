@@ -575,7 +575,7 @@ reg [31:0] op1; // reg for fetching first source register value
 reg [31:0] op2; // reg for fetching second source register value
 // Bimm an extracted immediate field value
 reg [31:0] nextPC; // reg for commputing next program counter value
-// PC is the program counter value
+// GenReg_PC is the program counter value
 ...
 op1 = GenRegBanks_X[rs1];  // fetching first source register value
 op2 = GenRegBanks_X[rs2];  // fetching second source register value
@@ -593,9 +593,9 @@ endcase
 ...
 always @(*) begin
   if (is_branch && do_branch) begin // if it is branch instruction execution and decided to do branch then
-    nextPC = PC + Bimm; // always relative branch
+    nextPC = GenReg_PC + Bimm; // always relative branch
   end else begin
-    nextPC = PC+4; // 32-bit instruction, need 4 bytes to move for the next instruction
+    nextPC = GenReg_PC+4; // 32-bit instruction, need 4 bytes to move for the next instruction
   end
 end
 ...
@@ -611,15 +611,15 @@ instead of documentation of existing or prepared material!
 GenRegBanks_X[rd] = Uimm;
 
 // for AUIPC
-GenRegBanks_X[rd] = Uimm + PC;
+GenRegBanks_X[rd] = Uimm + GenReg_PC;
 
 // for JAL
-GenRegBanks_X[rd] = PC + 4; // safely storing the next instruction address into the destination register address
-nextPC = PC + Jimm;
+GenRegBanks_X[rd] = GenReg_PC + 4; // safely storing the next instruction address into the destination register address
+nextPC = GenReg_PC + Jimm;
 
 // for JALR 
-GenRegBanks_X[rd] = PC + 4; // safely storing the next instruction address into the destination register address
-nextPC = PC + Iimm; 
+GenRegBanks_X[rd] = GenReg_PC + 4; // safely storing the next instruction address into the destination register address
+nextPC = GenReg_PC + Iimm; 
 // recall the differnce, JAL for jumping 20 bit offset address
 // JALR for jumping 12 bit offset address, both are relative jumping.
 ```
