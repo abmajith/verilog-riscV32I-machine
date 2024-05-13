@@ -140,6 +140,8 @@ If someone wants solid understanding of *Verilog* syntax, and
 what is the standard procedure for digital system design, I refer to the book
 *Verilog HDL: A Guide to Digital Design and Synthesis* by *Samir Palnitkar*.
 
+
+
 **Creating Read Only Instruction Memory in Verilog**
 I am just writing the subset of the read-only memory module here,
 In the subfolder (*readInstructionOnly*),
@@ -197,6 +199,8 @@ to low. Even if there is a change in address between the positive edges,
 reading the data from the new address only happens at the positive edge never in between.
 
 
+
+
 **Creating Read and Write Data Memory in Verilog**
 In this *Verilog* module, we have to provide *wire* for providing the data to write in the memory, 
 as well as *write enable* signal. 
@@ -236,6 +240,7 @@ The above read and write memory module is programmed when read enable is active 
 it loads the data from the memory address onto the processor at the positive edge 
 of the clock. Similarly, it writes the data onto the memory address at the positive 
 edge of the clock if the write enable is activated.
+
 
 
 **Creating Addressable I/O Device in Verilog**
