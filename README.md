@@ -153,8 +153,8 @@ Instruction type                 |        -       |   -    |  -    |    -     | 
 **J-type** (Jump Type)           |  *imm[20\10:1\11\19:12]*|  -|-  |    -     | *rd*          | *Opcode* 
 
 
-So far, we know rs2, rs1, and rd are Register fields in the encoding scheme, 
-where rs1, and rs2 represent the first and second source register address, and rd represents 
+So far, we know *rs2*, *rs1*, and *rd* are Register fields in the encoding scheme, 
+where *rs1*, and *rs2* represent the first and second source register address, and *rd* represents 
 destination register address.
 
 imm is a variable length subfield bit representing immediate constant value encoded within the instruction encoding. 
@@ -195,7 +195,7 @@ wire [31:0] Jimm = { {12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0}; 
 **Opcode** is a 7-bit wide subfield always located on 7-bit LSBs of the instructions. 
 In *RV32I* base format opcode[7:0] two LSBs are always *11*, and opcode[4:2] 
 is never equal to *111*. These encoding constraints are for natural 
-encoding extension schemes for *16, 48, 64, >=192* bits instructions sets defined in *RISC-V*. 
+encoding extension schemes for *16, 48, 64, >=192* bits instructions sets and extensions defined by *RISC-V*. 
 Note we are only looking after the *RV32I* base format, it does not have MUL, DIV, REM, floating arithmetic, etc...
 
 Opcode Value | represents | meaning, instruction type        |  calculation                 | #variants
@@ -213,8 +213,8 @@ Opcode Value | represents | meaning, instruction type        |  calculation
 1110011  | system  | Instructions EBREAK, ECALL              | skip details now             | 2 
 
 
-- *LUI* Look up immediate, a *U-Type* instruction to load 20 bits wide constant value (as *Uimm*) into 
-   the rd addressed register data.
+- *LUI* Load upper immediate field, a *U-Type* instruction to load 20 bits wide constant value (as *Uimm*) into 
+   the *rd* addressed register data.
 	- For example, *LUI X5 0x12345*,  it loads the 20 bits MSB of instruction encoding 
 	 (i.e *imm[31:12] = 0x12345*) into the register *X5* by *X5 <- (imm << 12)*. 
     - Instruction Encoding *imm[31:12](=0x12345) rd(=&X5) 0110111*.
@@ -229,32 +229,47 @@ Opcode Value | represents | meaning, instruction type        |  calculation
    (as *Jimm*) with *PC* register data.
 	- For example, *JAL X6 offset*, it performs *X6 = PC + 4*, followed by *PC = PC + Jimm* 
 	- i.e it store the return address in *X6*, and jump into the target address 
-	   with relative distance denoted in *Jimm*
+	   with relative *offset* extracted as *Jimm*
 	- Instruction Encoding *imm[20|10:1|11|19:12]  rd(=&X6) 1101111*, 
 	  where *offset* is expanded from *imm* using *Jimm* structure.
 
 - *JALR*: Jump and Link Register, to add 12 bits signed offset ( as *Iimm*) 
    with *PC* register data. 
-	- For example, *JALR X2 X1, offset*, it performs *X2 = PC + 4*, followed by *PC = X1 + Iimm*
+	- For example, *JALR X2 X1 offset*, it performs *X2 = PC + 4*, followed by *PC = X1 + Iimm*
 	- i.e it store the return address in *X2*, and then jump to the 
 	   relative address denoted in *X1 + Iimm*
 	- Instruction Encoding *imm[11:0] rs1(=&X1) 000 rd(=&X2) 1100111*, 
 	  where *offset* is expanded from *imm* using *Iimm* structure.
 
 - Branch instructions: there are 6 variants on conditional jumps, 
-		 		that depends on a test on two registers
+		 		that depends on a test on two registers. Detailed discussion provided down in this document.
 
-- Load and Store Instructions: loads based on *I-type* immediate constant value extraction 
-		 	and store based on *J-type* immediate constant value extraction.
+- Load and Store Instructions: loads based on *I-type* immediate constant value extraction
+      and store based on *J-type* immediate constant value extraction. This immediate field
+      acts as *offset* from the memory address stored in the source register.
+  - For example, *LW X1 offset(X2)*, it performs loading data from the memory address
+    pointed by *X2 + offset* into the register *X1*, more detailed explanation provided down in this document.
+
 
 - Immediate Instructions: arithmetic operations of *I-type* immediate constant value 
-		 	extraction and two register data.
+		 	extraction and two register data. Further discussion down in this document
 
 - Arithmetic Instructions: operates 32-bit arithmetic operations (pure *R-type*) 
-		 	on register data. 
+		 	on register data. Further discussion down in this document.
 
 - Fence and Systems: are used to implement memory ordering in multicore systems, 
 		 	and system calls/ebreak respectively.
+  - As you gather information from the name, *Fence* is a primitive synchronous mechanism 
+    (you might be familiar with this concept if you already dealt with concurrent programming) 
+    that ensures safe data write and instruction fetched in and from the memory area 
+    in multiteanant or multiprocessor system.
+  - System *ecall/ebreak* instruction, on the other hand, is used for software-based system calls or 
+    to generate breakpoints in debugging scenarios. 
+    When executed, *ebreak* causes the processor to raise an exception, 
+    which can be handled by the operating system or a debugging environment.
+  - We could skip these two instructions types in this document and *Verilog* development.
+    But will revisit after the successful implementation of working *Von Neuman Single Core* design
+    for *RV32I*. 
 
 Let's look into opcode and decide opcode instruction using double equal check 
 statement in verilog code.
@@ -291,9 +306,9 @@ As the *R* instruction encoding *Funct7 rs2 rs1 Funct3 rd Opcode7*,
 extracting rs1, rs2, and rd registers addresses as 
 ```verilog
 ...
-wire [4:0] addr_rs1 = inst[19:15]; // 5 bits wide first register source address
-wire [4:0] addr_rs2 = inst[24:20]; // 5 bits wide second register source address
-wire [4:0] addr_rd  = inst[11:7];  // 5 bits wide register destination address
+wire [4:0] rs1 = inst[19:15]; // 5 bits wide first register source address
+wire [4:0] rs2 = inst[24:20]; // 5 bits wide second register source address
+wire [4:0] rd  = inst[11:7];  // 5 bits wide register destination address
 ...
 ```
 To choose one among 10 variants of arithmetic *R-type* instruction by 
@@ -362,26 +377,26 @@ So, the *funct7* code is almost constant (*0000000*), except for two
 instructions (*SUB, SRA* with *0100000*). Let's write a Verilog code to do *arithmetic R-type instructions* 
 based on *case endcase* statement on *funct3,funct7*
 ```verilog
-reg [31:0] rs1; // reg for fetching first source register value
-reg [31:0] rs2; // reg for fetching second source register value
+reg [31:0] op1; // reg for fetching first source register value
+reg [31:0] op2; // reg for fetching second source register value
 ...
-rs1 <= GenRegBanks_X[addr_rs1];  // fetching first source register value
-rs2 <= GenRegBanks_X[addr_rs2];  // fetching second source register value
+op1 = GenRegBanks_X[rs1];  // fetching first source register value
+op2 = GenRegBanks_X[rs2];  // fetching second source register value
 ...
-reg [31:0] l_rd; // local reg for storing the arithmetic R-type instruction result
+reg [31:0] result; // local reg for storing the arithmetic R-type instruction result
 ...
 case(funct3)
-	3'b000: l_rd = (funt7[5]) ? (rs1 - rs2) : (rs1+rs2);                          // addition or subtraction
-	3'b001: l_rd = (rs1 << rs2[4:0]);                                             // left shift logical
-	3'b010: l_rd = ($signed(rs1) < $signed(rs2));                                 // signed less than
-	3'b011: l_rd = (rs1 < rs2);                                                   // unsigned less than
-	3'b100: l_rd = (rs1 ^ rs2);                                                   // bitwise xor
-	3'b101: l_rd = (funct7[5]) ? ($signed(rs1) >>> rs2[4:0]) : (rs1 >> rs2[4:0]);  // shift right logical or arithmetic 
-	3'b101: l_rd = (rs1 | rs2);					                                  // bitwise or
-	3'b111: l_rd = (rs1 & rs2);						                              // bitwise and 
+	3'b000: result = (funt7[5]) ? (op1 - op2) : (op1+op2);                          // addition or subtraction
+	3'b001: result = (op1 << op2[4:0]);                                             // left shift logical
+	3'b010: result = ($signed(op1) < $signed(op2));                                 // signed less than
+	3'b011: result = (op1 < op2);                                                   // unsigned less than
+	3'b100: result = (op1 ^ op2);                                                   // bitwise xor
+	3'b101: result = (funct7[5]) ? ($signed(op1) >>> op2[4:0]) : (op1 >> op2[4:0]);  // shift right logical or arithmetic 
+	3'b101: result = (op1 | op2);					                                  // bitwise or
+	3'b111: result = (op1 & op2);						                              // bitwise and 
 endcase
 ...
-GenRegBanks_X[addr_rd] <= l_rd;  // transfering the computed local result to the destination address
+GenRegBanks_X[rd] <= result;  // transfering the computed local result to the destination register
 ...
 
 ```
@@ -413,31 +428,31 @@ value into 32-bit value.
 
 Here, we are not listing the *arithmetic I-type* instruction and verilog operations in detail, 
 since it is almost the same procedure as *arithmetic R-type* instructions, 
-The only procedure difference is, that there is no second source register address *addr_rd*, 
-instead, we have *Iimm* (a signed extension of the immediate field).
+The only difference is, that there is no second source register address *rs2* and hence no second operand, 
+instead, we have *Iimm* (a signed extension of the immediate field) as the second operand.
 
-But wait a minute, we have 9 variants in this type, and we don't have *funct7*, 
+But wait a minute, we have 9 variants in this type, and we don't have *funct7*,
 how exactly do we choose the correct instruction for execution by just using *funct3*? <br />
-Ans: Let's go back and read *arithmetic I-type instructions*, now we know that only 
+Ans: Let's go back and read *arithmetic I-type instructions*, now we know that only
 overlapping can happen for *SRLI, SRAI* when *funct3==101*. So?
-Recall once more information, for doing shift operations in a 32-bit instruction register, we need only 5 LSBs of immediate field, 
-the remaining 7 bits are not needed, 
-when the compiler or assembler produces such code, it will use this space 
-to inform the hardware to choose either *SRLI* or *SRAI*.  <br />
+Recall one more information, for doing shift operations in a 32-bit instruction register, we need only 5 LSBs of immediate field,
+the remaining 7 bits can be used efficiently,
+when the compiler or assembler produces such code, it uses this space
+to inform the hardware to choose either *SRLI* or *SRAI*.  <br />
+It is an important point to remember when creating the respective *Verilog* module, 
+as it happens to me, I spend a lot of time debugging the *SRA* immediate instruction (code in the subfolder *RV32I_VonNeumanArch*). <br />
+
 
 *RISC-V* has specification for this operation, 
 if imm[10]th bit (i.e instruction 30th bit) is zero 
 it has to perform *SRLI* otherwise it has to perform *SRAI*. 
 
 
-For the sake of completeness let's list all the uncovered instruction 
-type except for fence and system instructions *EBREAK, ECALL*.  
-We will postpone the discussion of the system and fence call as much as possible!
-
-
 **Load and Store Instructions**
 *RV32I* is 32-bit address space that is byte-addressed, (i.e a 32-bit address will point to a byte memory). 
-In *RV32I*, all the arithmetic instructions only operates on CPU registers(*X0 to X31, PC*), never on the memory.
+In *RV32I*, all the arithmetic instructions only operates on CPU registers(*X0 to X31, PC*), 
+it never perform computation directly on the memory data. It loads data from memory, perform some computation
+ within the registers and safely write back to the memory. 
 
 -**Store S-type Instructions**
 It has 3 variants, they are 
@@ -461,6 +476,26 @@ the second *least significant register byte* stored in memory *m+1* <br />
 *Word* store instruction *SW rs2 Offset(rs1)* stores value from register address *rs2* 
 to the memory address *m,m+1,m+2,m+3*, where *m* calcuated as before. <br />
 
+*Verilog* code snippet (for little-endieness format) will be
+
+```verilog
+reg [31:0] op1; // reg for fetching first source register value
+reg [31:0] op2; // reg for fetching second source register value
+reg [31:0] memAddr; // reg for storing the save memory address
+// Simm holds the immediate offset value
+...
+reg [7:0] RW_MEM[START_ADDRESS:START_ADDRESS+NUM_BYTE_MEM_BLOCKS-1]; // a block of read-write memory
+...
+op1 = GenRegBanks_X[rs1];  // fetching first source register value
+op2 = GenRegBanks_X[rs2];  // fetching second source register value
+memAddr = op2 + Simm;
+...
+RW_MEM[memAddr+0] <= op1[7:0];                                     // storing a least significant (LS) byte
+RW_MEM[memAddr+1] <= (funct3[0]) ? op1[15:8]  : RW_MEM[memAddr+1]; // based on *funct3* storing second LS byte
+RW_MEM[memAddr+2] <= (funct3[1]) ? op1[23:16] : RW_MEM[memAddr+2]; // for storing a word based on *funct3*
+RW_MEM[memAddr+3] <= (funct3[1]) ? op1[31:24] : RW_MEM[memAddr+3]; // for storing a word based on *funct3*
+```
+
 -**Load I-type instructions**
 It has 5 variants, which are
 
@@ -480,6 +515,27 @@ the leading bits value in register address *rd*, memory address *m* is computed 
 *Halfword unsigned* load instruction: *LHU rd Offset(rs1)* same as *LH* except, zero-filling in the lead bits value in register address *rd*,<br /> 
 *LW rd Offset(rs1)* loading 4 bytes from memory *m,m+1,m+2,m+3* into register address *rd*, *m* is computed as before, 
 here we do not have to worry about leading signed bit!<br />
+
+*Verilog* code snippet (for little-endieness format) will be
+```verilog
+reg [31:0] op1; // reg for fetching first source register value
+reg [31:0] memAddr; // reg for storing the load memory address
+// Iimm holds the immediate offset value
+...
+reg [7:0] MEM[START_ADDRESS:START_ADDRESS+NUM_BYTE_MEM_BLOCKS-1]; // a block of read or read-write memory
+...
+op1 = GenRegBanks_X[rs1];  // fetching first source register value
+memAddr = op1 + Iimm;
+
+case(funct3)
+  3'b000 : GenRegBanks_X[rd] <= {{24{MEM[memAddr][7]}}, MEM[memAddr]};                          // for loading a byte
+  3'b100 : GenRegBanks_X[rd] <= {{24{1'b0}}, MEM[memAddr]};                                     // for loading a unsigned byte
+  3'b001 : GenRegBanks_X[rd] <= {{16{MEM[memAddr+1][7]}}, MEM[memAddr+1], MEM[memAddr]};        // for loading half word
+  3'b101 : GenRegBanks_X[rd] <= {{16{1'b0}}, MEM[memAddr+1], MEM[memAddr]};                     // for loading unsigned half word
+  3'b010 : GenRegBanks_X[rd] <= {MEM[memAddr+3], MEM[memAddr+2], MEM[memAddr+1], MEM[memAddr]}; // for loading a full word
+endcase
+```
+
 
 **Jump and Branch B-type Instructions**
 There are 6 variants of it, they are 
@@ -512,10 +568,61 @@ and adding an offset value to *PC* (i.e. relative branching). Note for branching
 it does not want to save the return address, because it is 
 branching not function call or interrupt protocol.
 
+*Verilog* code snippet will be
+```verilog
+...
+reg [31:0] op1; // reg for fetching first source register value
+reg [31:0] op2; // reg for fetching second source register value
+// Bimm an extracted immediate field value
+reg [31:0] nextPC; // reg for commputing next program counter value
+// PC is the program counter value
+...
+op1 = GenRegBanks_X[rs1];  // fetching first source register value
+op2 = GenRegBanks_X[rs2];  // fetching second source register value
+...
+reg do_branch; // register for checking the branc condition
+case(funct3)
+3'b000:  do_branch = (op1 == op2);                   // branch on equal
+3'b001:  do_branch = (op1 != op2);                   // branch on not equal
+3'b100:  do_branch = ($signed(op1) < $signed(op2));  // branch on less than
+3'b101:  do_branch = ($signed(op1) >= $signed(op2)); // branch on greater than or equal to
+3'b110:  do_branch = (op1 < op2);                    // branch on less than, unsigned version
+3'b111:  do_branch = (op1 >= op2);                   // branch on greather than or equal to unsigned version
+default: do_branch = 1'b0;                           // default, dont do branch
+endcase
+...
+always @(*) begin
+  if (is_branch && do_branch) begin // if it is branch instruction execution and decided to do branch then
+    nextPC = PC + Bimm; // always relative branch
+  end else begin
+    nextPC = PC+4; // 32-bit instruction, need 4 bytes to move for the next instruction
+  end
+end
+...
+```
+
 We already discussed to an extent the *LUI, AUIPC, JAL*, and *JALR*. 
 We will move to create a subfolder for each instruction type and write *verilog code*. 
 Will do it in a way that will reflect the software development process 
 instead of documentation of existing or prepared material! 
+
+```verilog
+// for LUI instruction
+GenRegBanks_X[rd] = Uimm;
+
+// for AUIPC
+GenRegBanks_X[rd] = Uimm + PC;
+
+// for JAL
+GenRegBanks_X[rd] = PC + 4; // safely storing the next instruction address into the destination register address
+nextPC = PC + Jimm;
+
+// for JALR 
+GenRegBanks_X[rd] = PC + 4; // safely storing the next instruction address into the destination register address
+nextPC = PC + Iimm; 
+// recall the differnce, JAL for jumping 20 bit offset address
+// JALR for jumping 12 bit offset address, both are relative jumping.
+```
 
 **Winding Up**
 We acquired that in *RV32I* (or any other base instruction set from *RISC-V*), the
