@@ -143,8 +143,8 @@ There are totally 6 different encoding formats present in *RV32I*,
 among them, 4 are core instruction formats (R/I/S/U) in *RV32I* 
 and two additional formats (B/J), let's list them here.
 
-Instruction type                 |                |        |       |          |               |
----------------------------------|----------------|--------|-------|----------|---------------|----------------
+Instruction type                 |        -       |   -    |  -    |    -     |       -       |    -
+---------------------------------|----------------|--------|-------|----------|---------------|-----------
 **R-type** (Register Type)       |  *Funct7*      |  *rs2* | *rs1* | *Funct3* | *rd*          | *Opcode* 
 **I-type** (Immediate Type)      |  *imm[11:0]*   |   -    | *rs1* | *Funct3* | *rd*          | *Opcode* 
 **S-type** (Store Type)          |  *imm[11:5]*   |  *rs2* | *rs1* | *Funct3* | *imm[4:0]*    | *Opcode* 
