@@ -1,6 +1,7 @@
 # Short Notes on Von-Neuman Architecture
 
-This repo is about gathering short knowledge on Von-Neuman architecture, 
+This repo is about gathering primitive knowledge on Von-Neuman architecture 
+and providing *Verilog* simulation of various components,  
 it is written explicitly with reference from the book "Designing Embedded Hardware" 
 by John Catsoulis and "Programming Embedded Systems" by Michael Barr.
 
@@ -9,15 +10,20 @@ Let's start discussing, a picture is worth a thousand words,
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/archBasicPicture.jpg" alt="J" width="800"/>
 
 
-In a Von-Neumann architecture, the same address and data bus are used for
-reading from and writing to memory. This concept is known as memory-mapped I/O,
-where memory and I/O devices are accessed using the same address space. For example, if a processor is designed to have a 32-bit address bus, then it
+As in the above picture, Von-Neumann architecture has a simplified address space, 
+the processor communicates with both memory and I/O devices through the same address and data bus. 
+The address space is typically divided into regions for memory and I/O devices. 
+This division allows the processor to distinguish between memory accesses and I/O operations. 
+For example, addresses in a certain range might correspond to memory locations, 
+while addresses in another range might correspond to registers of I/O devices.
+
+
+If a processor is designed to have a 32-bit address bus, then it
 can address in the range of [0x0000 0000, 0xFFFF FFFF] in hexadecimal number,
 which is up to *4GB* of memory.
-This address space is typically divided into regions for memory and I/O devices.
 
 - Within this address space, certain ranges are reserved for memory like *RAM, ROM, Flash,*, etc.,
-  while other ranges are allocated for I/O devices like *serial ports, GPIO pins, etc*.
+  while other ranges are allocated for I/O devices like *serial ports, GPIO registers, etc*.
 
 - Each memory location and I/O device is assigned a unique address within the address space.
 
@@ -30,15 +36,17 @@ In this memory-mapped I/O address space, the block of memory and I/O devices cou
 
 
 **Memory**
-In a Von Neumann architecture, the same *memory* space is used to store program instructions and data
+In a Von Neumann architecture, the *memory* space is used to store program instructions and data
 manipulated by the *processor*. The memory is never empty, it always contains something,
 whether it be instructions, meaningful data, or random garbage.
 
-Usually, in the system organization, the instructions for the application are kept in a read-only memory region,
-so that the processor sequentially reads instructions and executes them. This memory space does not change during the program execution.
-The rest of the memory space is used for storing dynamic data, including variables, arrays, and any other data      
-structures needed for the application. This portion of memory is read from and written to by the *processor*
-as the program executes, and its contents may change over time. 
+Usually, in the embedded system organization, the instructions for the application 
+are kept in a read-only memory region, so that the processor sequentially reads 
+instructions and executes them. This memory space does not change during 
+the program execution. The rest of the memory space is used for storing dynamic data, 
+including variables, arrays, and any other data structures needed for the application. 
+This portion of memory is read from and written to by the *processor* as the program executes, 
+and its contents may change over time. 
 
 
 **Buses**
@@ -63,10 +71,10 @@ in writing to memory and I/O, and there is no difference in reading from memory
 and I/O or reading instruction from memory.
 
 
-
 **Processor**
-A *processor* sometimes also known as a *CPU* (Central Processing Unit), its main functionality is
-the reading sequence of instructions from the code block (in the memory region), decoding it, executing it, and store it in
+A *processor* sometimes also known as a *CPU* (Central Processing Unit), 
+its main functionality is the reading sequence of instructions from the code block 
+(in the memory region), decoding it, executing it, and store it in
 its register or write in *memory* (also I/O blocks). It also handles interrupts from I/O devices.
 
 Let's see some basic building blocks inside the processor and key interrupt handling.
@@ -74,7 +82,7 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 - *ALU*
   - It is responsible for performing arithmetic and logic operations on data.
 
-  - Depending on the processor design, it performs addition, subtraction, multiplication, bitwise *AND*, *OR*,
+  - Depending on the processor design and instruction set, it performs addition, subtraction, multiplication, bitwise *AND*, *OR*,
       shift operations, comparison operations, etc.
 
   - It takes input from registers or memory and provides the outputs.
@@ -87,7 +95,7 @@ Let's see some basic building blocks inside the processor and key interrupt hand
   - Common types are *PC* (program counter), *IR* (instruction register) holds currently fetched instruction, General-purpose
       registers, *SP* stack pointer, *CSR* control and status register holds flags indicating processor status.
 
-  - Depending on the processor design, the existence of these registers, and register width varies a lot.
+  - Depending on the processor design, the existence of these registers, and register width varies.
 
   - Some *processors* also have *shadow registers*, which save the state of the main registers 
 	  when the processor begins servicing an interrupt. It avoids explicitly writing the 
@@ -98,9 +106,9 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 	from the processor, causing the processor to divert from the current 
 	execution and deal with the event that has occurred.
 
-  - When an interrupt occurs, the usual procedure is for the processor to save its state 
-		by pushing its registers, *PC* onto the stack or *shadow register*. 
-		The processor then loads an interrupt vector into the *PC*.
+  - When an interrupt occurs, the processor typically saves its state by pushing 
+    register values onto a shadow register or the stack, and then loads an interrupt 
+    vector into the program counter (*PC*).
 
   - The interrupt vector is the address where an interrupt service routine (*ISR*) lies. 
 		Thus loading the vector into the program counter, and beginning the execution of the ISR, 
@@ -161,9 +169,12 @@ endmodule
 ```
 Note: In the created module, each addressable memory has 32-bit data, not 8-bit data. As long as
 we are working with just memory region, it is okay, when we go for memory-mapped I/O,
-we have to go with a strict 8-bit data bus. It is not a wise choice to assume I/O devices 
-are also 32-bit wide in communication. We will bring the memory alignment into the design 
-when we go down the path and build a unified memory module.
+we have to go with an 8-bit aligned memory. It is better not to assume I/O devices        
+are also 32-bit wide in communication. So only part of the data bus is wired with I/O devices.
+
+We will bring the memory alignment into the design when we go down the path and 
+build a unified memory module.
+
 
 ```bash
 iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
@@ -172,6 +183,15 @@ iverilog instructionMemory.v instructionMemory_tb.v -o instrMemSim
 #insert clk, address, rd_en, zoom out, there is your simulation result in signal form
 gtkwave
 ```
+
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/readInstructionOnly/readInstructionOnlyClk.png" alt="J" width="800"/>
+In the above read instruction, only the memory module is designed in a way that,
+when a clock signal goes from negative to positive (denoted as a positive edge) 
+and read enable is active high, it loads the data from the address space onto the processor. 
+Its value stays until the change in address or read enable is set 
+to low. Even if there is a change in address between the positive edges, 
+reading the data from the new address only happens at the positive edge never in between.
+
 
 **Creating Read and Write Data Memory in Verilog**
 In this *Verilog* module, we have to provide *wire* for providing the data to write in the memory, 
