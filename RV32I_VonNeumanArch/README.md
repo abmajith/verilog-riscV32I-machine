@@ -248,6 +248,7 @@ We are not working in real hardware, we will simulate the behavior of I/O device
 memory! We will see how general-purpose input output pins can be read and written.
 The test bed code, and module code are in the sub folder name IOdevice. 
 
+
 ```verilog
 module GPIO # (
   // parameter for setting number of sets of 8-pin parallel port
@@ -271,7 +272,7 @@ module GPIO # (
   // Note there is 2 times the num of gpio pin set.
 
   // gpio_status_data[0,2,4,..] for setting GPIO pins read/write status
-  // gpio_status_data[1,3,5,..] for actual GPIO pins data
+  // gpio_status_data[1,3,5,..] for actual GPIO pins data storage
 
   // initialize the data
   initial begin
@@ -287,9 +288,9 @@ module GPIO # (
     end
   end
 
-  // setting the enable status (only write) of the GPIO pins
+  // setting the enable status (only write) of the GPIO pins on the odd numbered byte
   always @ (posedge clk) begin
-    if (~rst && !addr[0]) begin
+    if (~rst && !addr[0]) begin 
       gpio_status_data[addr] <= wr_data;
     end
   end
@@ -314,11 +315,18 @@ module GPIO # (
 endmodule
 ```
 
+The above module for *GPIO* is written with the knowledge of typical GPIO pin construction in modern 
+embedded boards (if you already worked in STM Nucleo board, there is a contiguous memory for each 8-pin 
+port like GPIO ports A, B, C,..., there is a well-defined address to set the status of the pins and 
+an address to read/write data from/to the port pins).
+
+
 There are some other  important I/O devices, like a timer counter for generating periodic interrupt signals,
 *UART* (universal asynchronous receiver and transmitter) for a serial port transmission and receiver.
 
 We will develop these important I/O devices and their interrupt mechanism after creating a bare minimum processor, 
 aligned memory access for read-only, and read-and-write memory.
+
 
 **Aligned Memory**
 Note, in the earlier memory code (either read instruction only or read-write memory modules),
