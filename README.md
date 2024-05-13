@@ -638,7 +638,7 @@ base instruction set of the *RISC-V ISA*, along with the memory architecture:
 **Processor Core:**
 - The processor core contains components such as the instruction fetch unit 
 (to grab the instruction from the code block), 
-instruction decode unit, execution units (like *ALU* arithmetic logic unit), 
+instruction decode unit, execution units (like *ALU* arithmetic logic unit, load/store data, branching,etc), 
 register bank, and the control logic.
 
 - Instructions are fetched from memory, decoded, and executed within the processor core.
@@ -669,7 +669,8 @@ to organize our thoughts and develop organized software.
 For a detailed picture and discussion about processors and their architecture 
 refer to intellectual academic journals and open-source material.
 
-I wrote a short description on the page 
+I wrote a short description about a single core Von-Neuman architecture a much simpler architecture to realize
+for *RISC-V* type instruction on the page 
 <a href="https://github.com/abmajith/verilog-riscV32I-machine/tree/main/RV32I_VonNeumanArch" 
  		class="custom-link">Executing RV32I in Von-Neuman Architecture with Verilog module and test bench</a>
 (*Von Neuman*, pronounced as F'n-Noy-mon). 
