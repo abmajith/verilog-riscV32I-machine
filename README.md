@@ -1,6 +1,6 @@
 # verilog-riscV32I-machine
 
-*This repo is about Learning  RISC V 32-bit integer base instructions set,
+*This repo is about Learning  RISC V 32-bit integer base instructions set,
 making a cookbook for the instruction sets and its verilog implementation procedure*
 
 *RISC-V* (say risk-five) is an open-source instruction set architecture (*ISA*)
@@ -8,21 +8,22 @@ based on *RISC* (reduced instruction set computer).
 
 
 The basic philosophy behind *RISC* is
-to move the maximum complexity from the silicon to the language compiler (to assembly code writer). 
+to move the maximum complexity from the silicon to the language compiler (to assembly code writer).
 The hardware (development and design) is kept as simple
-and fast as possible  (i.e. simplify the instruction, with the effect of
-increasing the complexity in writing the assembly programs! complexity in the
-sense that the details in writing assembly program code).
+and fast as possible, i.e. simplify the instruction, lightweight low-power hardware circuit for  
+decoding the instruction and execution within the silicon, with the side effects involved 
+assembly program development.
 
-*RISC-V* instruction is simple, it is designed to have a limited number  
-of instructions and the decoding procedure to extract the information.            
-For example, one can have a *clear* instruction in their instruction set,
+*RISC-V* instruction is simple, it is designed to have a limited number
+of instructions and the decoding procedure to extract the information.
+For example, one can have an instruction *clear* in their instruction set,
 to clear one of its general purpose register banks (*reg0*), the same operation can be met by
-doing *xor* operation (*reg0 ^ reg0*). Thus the separate *clear* instruction is no longer required.
+doing *xor* operation (*reg0 ^ reg0* a logical bitwise exclusive or operation). 
+Thus the separate *clear* instruction is no longer required.
 
 Another simplicity in *RISC-V* design is that it simplifies the data access.
-It transfers data via only load and store instructions, all other operations are solely performed
-within the processor.
+It transfers data via only two instructions namely *load* and *store*, all other operations 
+are solely performed within the processor.
 
 Here will go through how a particular base *RV32I* *RISC-V* 32-bit Integer Instruction set
 constructed, and the *Verilog* code.
@@ -35,10 +36,12 @@ Volume I: Unprivileged ISA**
 There are four *RISC-V ISA* base architectures, 
 *RV32I*, *RV32E* (embeded version of RV32I for energy constraint), *RV64I*, *RV128I*.
 
-*RV32I* it is a gateway to understand other *RISC-V ISA* bases and extensions 
-(yes, there are multiple extensions). 
+*RV32I* it is a gateway to understand other *RISC-V ISA* bases and extensions. 
 All these base instruction sets support integer arithmetic (*and, or, xor, add, sub, shift right, shift left*). 
 It does not support floating point arithmetic or integer multiplication/division. 
+
+To include integer multiplication/division capability, we have to include the extension *M* that comprise
+details on multiplication/division encoding formats.
 
 
 *RV32I* Instruction set can be classified into 7 classes (in a simple human-readable way), they are
@@ -140,14 +143,14 @@ There are totally 6 different encoding formats present in *RV32I*,
 among them, 4 are core instruction formats (R/I/S/U) in *RV32I* 
 and two additional formats (B/J), let's list them here.
 
-Instruction type                 | encoding format
----------------------------------|----------------------------------------------------------
-**R-type** (Register Type)       |  *Funct7     rs2   rs1 Funct3 rd          Opcode* 
-**I-type** (Immediate Type)      |  *imm[11:0]        rs1 Funct3 rd          Opcode* 
-**S-type** (Store Type)          |  *imm[11:5]  rs2   rs1 Funct3 imm[4:0]    Opcode* 
-**B-type** (Branch Type)         |  *imm[12\10:5] rs2 rs1 Funct3 imm[4:1\11] Opcode* 
-**U-type** (Upper Immediate Type)|  *imm[31:12]                  rd          Opcode* 
-**J-type** (Jump Type)           |  *imm[20\10:1\11\19:12]       rd          Opcode* 
+Instruction type                 |                |        |       |          |               |
+---------------------------------|----------------|--------|-------|----------|---------------|----------------
+**R-type** (Register Type)       |  *Funct7*      |  *rs2* | *rs1* | *Funct3* | *rd*          | *Opcode* 
+**I-type** (Immediate Type)      |  *imm[11:0]*   |   -    | *rs1* | *Funct3* | *rd*          | *Opcode* 
+**S-type** (Store Type)          |  *imm[11:5]*   |  *rs2* | *rs1* | *Funct3* | *imm[4:0]*    | *Opcode* 
+**B-type** (Branch Type)         |  *imm[12\10:5]*|  *rs2* | *rs1* | *Funct3* | *imm[4:1\11]* | *Opcode* 
+**U-type** (Upper Immediate Type)|  *imm[31:12]*  |    -   |  -    |    -     | *rd*          | *Opcode* 
+**J-type** (Jump Type)           |  *imm[20\10:1\11\19:12]*|  -|-  |    -     | *rd*          | *Opcode* 
 
 
 So far, we know rs2, rs1, and rd are Register fields in the encoding scheme, 
@@ -185,6 +188,7 @@ wire [31:0] Simm = { {21{inst[31]}}, inst[30:25], inst[11:7]};                  
 wire [31:0] Bimm = { {20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};   // if inst is *B-type* instruction
 wire [31:0] Uimm = { inst[31:12], {12{1'b0}}};                                  // if inst is *U-type* instruction
 wire [31:0] Jimm = { {12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0}; // if inst is *J-type* instruction
+// we dont have RImm, as *R-type* instruction don't have immediate field
 ```
 
 
