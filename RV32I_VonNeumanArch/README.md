@@ -660,7 +660,7 @@ As we have seen the module *ByteAlignInstructionMemory*, for the given input add
 using the above *decode* module, we can extract the various signals instruction signals like *opcode,funct3,funct7,etc* 
 as show in the following picture.
 
-<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/instructiondecodePCblock.jpg" alt="J" width="800"/>
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/instructiondecodePCblock.jpg" alt="J" width="800"/>
 
 
 
