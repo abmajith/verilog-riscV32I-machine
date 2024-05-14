@@ -668,7 +668,7 @@ as show in the following picture.
 among them, 19 arithmetic instructions (10 perform only on registers and 9 with immediate and registers value).
 
 Let's write them in simple modular form to do just arithmetic operations, hide the details of instruction type,
-pass the operands, and get back the arithmetic results and status values. 
+pass the two operands, and get back the arithmetic results and status values. 
 
 ```verilog
 module IV32IALU
@@ -696,7 +696,7 @@ module IV32IALU
 
   // if subtract use one's complement and add one otherwise normal sum
   assign sum      = op_a + op_b;
-  assign minus    = {1'b0, op_a} + {1'b1, ~op_b} + 33'b1;
+  assign minus    = {1'b0, op_a} + {1'b1, ~op_b} + 33'b1; // minus by doing 2's complement
   assign zero     = (|result) ? 1'b0 : 1'b1; // if the result is zero, set the zero wire
   assign negative = result[31];
   assign LT       = (op_a[31] ^ op_b[31]) ? op_a[31] : minus[32];
@@ -738,9 +738,68 @@ module IV32IALU
 endmodule
 ```
 
+Let's see verilog code snippet for loading the operands from register file
+```verilog
+...
+reg en_wr;
+//registerfile instance
+registerFile # (
+  .REG_DEPTH(32),
+  .REG_WIDTH(32),
+  .RADDR_WIDTH(5)
+) registerBankInst (
+    .clk(clk),
+    .rst(rst),
+    .we(en_wr),
+    .rs1_addr(rs1_addr),
+    .rs2_addr(rs2_addr),
+    .rd_addr(rd_addr),
+    .rd_value(rd_value),
+    .rs1_value(rs1_value),
+    .rs2_value(rs2_value)
+  );
+
+wire op_sign;
+assign op_sign = funct7[5];
+
+reg zero;
+reg negative;
+reg overflow;
+reg [31:0] alu_result;
+// alu instance
+IV32IALU (
+  .op_a(op_a),
+  .op_b(op_b),
+  .funct3(funct3),
+  .op_sign(op_sign),
+
+  .zero(zero),
+  .negative(negative),
+  .overflow(overflow),
+  .result(alu_result)
+);
+...
+en_wr = 1'b0; // before executing alu circuit, it should be set zero,
+//exact implemention involves some clock triggered and state based one, verilog is hard wired circuit!
+...
+op_a = (rg_re1) ? rs1_value: 32'b0;
+op_b = (rg_re2) ? rs2_value: (is_alu_imm) ? ImmediateOperand : 32'b0;
+...
+rd_value = ((is_alu_reg || is_alu_imm) && rg_we) ? alu_result : 32'b0;
+en_wr = (is_alu_reg || is_alu_imm) ? rg_wr : 1'b0; // if it is arithmetic related operation, perform write enable 
+// to write on rd_addr register address with value rd_value
+
+```
+
+Let's grasp the register loading and performing arithmetic operations in the block diagram as below.
+
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/registerALUBlocks.jpg" alt="J" width="800"/>
+
+
 At this moment we have a module for *memory, ALU, Register, and instruction decoder*, we can proceed to build a processor
 that executes the *RV32I* base instruction set, all it has to do is bind all the modules so far created
-and make them work. The design principle we followed is called the modular and bottom-up approach. We
+and form extra logic for performing load/store data from/to memory (RAM), jump and link registers instruction logic, 
+and branch instruction logic. The design principle we followed is called the modular and bottom-up approach. We
 discussed a bit about processor and memory access, without looking into the block diagram of a processor.
 Here, for the first time, we will draw a block diagram for a processor with various blocks like
 *memory, ALU, Register, decoder, PC, control and status register, etc.*
