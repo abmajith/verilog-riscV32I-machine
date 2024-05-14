@@ -654,6 +654,16 @@ module decode (
 endmodule
 ```
 
+Let's discuss the instruction loading unit and decoder from the above modules.
+As we have seen the module *ByteAlignInstructionMemory*, for the given input address *iaddr* 
+(indicated by program counter register), it signals the 4 bytes instruction output, 
+using the above *decode* module, we can extract the various signals instruction signals like *opcode,funct3,funct7,etc* 
+as show in the following picture.
+
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/instructiondecodePCblock.jpg" alt="J" width="800"/>
+
+
+
 *Arithmetic Logic Unit* (ALU), In the *RV32I* base instruction format, there are around 40 instructions,
 among them, 19 arithmetic instructions (10 perform only on registers and 9 with immediate and registers value).
 
