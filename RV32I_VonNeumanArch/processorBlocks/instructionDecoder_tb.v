@@ -7,9 +7,9 @@ module instructionDecoderTB;
   wire wr_en;
   wire rd_en1;
   wire rd_en2;
-  wire [5:0] rd_addr;
-  wire [5:0] rs1_addr;
-  wire [5:0] rs2_addr;
+  wire [4:0] rd_addr;
+  wire [4:0] rs1_addr;
+  wire [4:0] rs2_addr;
   
 
   wire [6:0] opcode;

@@ -4,11 +4,11 @@ module decode (
 
   // couple of register address to read and write
   output reg   rg_we, // register write enable
-  output [5:0] rd_addr,
+  output [4:0] rd_addr,
   output reg   rg_re1, // use rs1_addr enable
-  output [5:0] rs1_addr,
+  output [4:0] rs1_addr,
   output reg   rg_re2, // use rs2_addr enable
-  output [5:0] rs2_addr,
+  output [4:0] rs2_addr,
 
   // opcode 
   output [6:0] opCode,
