@@ -10,15 +10,15 @@ module ReadWriteMemory_tb;
   // input signals
   reg clk = 0;
   // write related signal
-  reg [31:0] wr_addr = 0;
-  reg        wr_en = 0;
-  reg [31:0] wr_data = 0;
-  reg [1:0]  by_wlen = 0;
+  reg [31:0]  wr_addr = 0;
+  reg         wr_en = 0;
+  reg [31:0]  wr_data = 0;
+  reg [1:0]   wr_mode = 0;
   //read related signal
-  reg [31:0] rd_addr = 0;
-  reg        rd_en = 0;
+  reg [31:0]  rd_addr = 0;
+  reg         rd_en = 0;
   wire [31:0] rd_data;
-  reg [1:0]  by_rlen = 0; 
+  reg [1:0]   rd_mode = 0; 
 
 
   // instantiate the ByteRAM module
@@ -31,11 +31,11 @@ module ReadWriteMemory_tb;
     .wr_addr(wr_addr),
     .wr_en(wr_en),
     .wr_data(wr_data),
-    .by_wlen(by_wlen),
+    .wr_mode(wr_mode),
     // read related signals
     .rd_addr(rd_addr),
     .rd_en(rd_en),
-    .by_rlen(by_rlen),
+    .rd_mode(rd_mode),
     .rd_data(rd_data)
   );
   
@@ -58,7 +58,7 @@ module ReadWriteMemory_tb;
     // write byte by byte
     rd_en = 0;
     wr_en = 1;
-    by_wlen = 0;
+    wr_mode = 0;
     for (ad = START_ADDRESS; ad < STOP_ADDRESS; ad = ad+1) begin
       wr_addr = ad;
       wr_data[7:0] = $random;
@@ -69,7 +69,7 @@ module ReadWriteMemory_tb;
     // read byte by byte
     rd_en = 1;
     wr_en = 0;
-    by_rlen = 0;
+    rd_mode = 0;
     for (ad = START_ADDRESS; ad < STOP_ADDRESS; ad = ad+1) begin
       rd_addr = ad; // read byte by byte
       #10;
@@ -78,7 +78,7 @@ module ReadWriteMemory_tb;
     // write two byte
     rd_en=0;
     wr_en=1;
-    by_wlen=1; // c style length index
+    wr_mode=1; // c style length index
     for (ad = START_ADDRESS; ad < STOP_ADDRESS; ad = ad+2) begin
       wr_addr = ad;
       wr_data[15:0] = $random;
@@ -89,7 +89,7 @@ module ReadWriteMemory_tb;
     // read two byte
     rd_en=1;
     wr_en=0;
-    by_rlen=1;
+    rd_mode=1;
     for (ad = START_ADDRESS; ad < STOP_ADDRESS; ad = ad+2) begin
       rd_addr = ad;
       #10;
@@ -98,7 +98,7 @@ module ReadWriteMemory_tb;
     // write a word
     rd_en = 0;
     wr_en = 1;
-    by_wlen = 3;
+    wr_mode = 2;
     for (ad = START_ADDRESS; ad < STOP_ADDRESS; ad = ad+4) begin
       wr_addr = ad;
       wr_data[31:0] = $random;
@@ -109,7 +109,7 @@ module ReadWriteMemory_tb;
     // read a word
     rd_en=1;
     wr_en=0;
-    by_rlen=3;
+    rd_mode=2;
     for (ad = START_ADDRESS; ad < STOP_ADDRESS; ad = ad+4) begin
       rd_addr = ad;
       #10;

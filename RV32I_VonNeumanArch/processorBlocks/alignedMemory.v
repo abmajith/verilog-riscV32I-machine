@@ -19,7 +19,8 @@ module ByteAlignInstructionMemory
   end
   
   assign isValid = ( iaddr >= START_ADDRESS && iaddr <= STOP_ADDRESS) ? 1'b1 : 1'b0;
-  assign instruction = {{mem[{iaddr[31:2],2'b11}]}, {mem[{iaddr[31:2],2'b10}]}, {mem[{iaddr[31:2],2'b01}]}, {mem[{iaddr[31:2],2'b00}]} };
+  assign instruction = { {mem[{iaddr[31:2],2'b11}]}, {mem[{iaddr[31:2],2'b10}]}, 
+                          {mem[{iaddr[31:2],2'b01}]}, {mem[{iaddr[31:2],2'b00}]} };
 endmodule
 
 
@@ -36,36 +37,35 @@ module ByteRAM
   input [31:0] wr_addr,
   input        wr_en,
   input [31:0] wr_data,
-  input [1:0]  by_wlen, // byte write len
+  input [1:0]  wr_mode, // mode 0, single byte, 1 for half word, 2 for full word
 
   // read address with enable signal, and number of bytes
   input [31:0] rd_addr,
   input        rd_en,
-  input [1:0]  by_rlen,
+  input [1:0]  rd_mode, // mode 0, single byte, 1 for half word, 2 for full word
   output [31:0] rd_data
   );
+  
 
   reg [7:0] mem [START_ADDRESS:STOP_ADDRESS];
-
+  
   always @ (posedge clk) begin
     if (wr_en) begin
       // there is atleast one byte to write
       mem[wr_addr+0] <= wr_data[7:0];
-      mem[wr_addr+1] <= (|by_wlen)   ? wr_data[15:8]  : mem[wr_addr+1];
-      mem[wr_addr+2] <= (by_wlen[1]) ? wr_data[23:16] : mem[wr_addr+2];
-      mem[wr_addr+3] <= (&by_wlen)   ? wr_data[31:24] : mem[wr_addr+3];
+      mem[wr_addr+1] <= (wr_mode[0])   ? wr_data[15:8]  : mem[wr_addr+1];
+      mem[wr_addr+2] <= (wr_mode[1])   ? wr_data[23:16] : mem[wr_addr+2];
+      mem[wr_addr+3] <= (wr_mode[1])   ? wr_data[31:24] : mem[wr_addr+3];
       // note here this block is writing without alignment constraints
-      // now we could realize why reading consecutive memory is faster than
-      // reading byte here and there in c program
     end
   end
-  assign rd_data[7:0]   = (rd_en)               ? {mem[rd_addr+0]} : 8'b0;
-  assign rd_data[15:8]  = (rd_en && |by_rlen)   ? {mem[rd_addr+1]} : 8'b0;
-  assign rd_data[23:16] = (rd_en && by_rlen[1]) ? {mem[rd_addr+2]} : 8'b0;
-  assign rd_data[31:24] = (rd_en && &by_rlen)   ? {mem[rd_addr+3]} : 8'b0;
+  assign rd_data[7:0]   = (rd_en)                 ? {mem[rd_addr+0]} : 8'b0;
+  assign rd_data[15:8]  = (rd_en && rd_mode[0])   ? {mem[rd_addr+1]} : 8'b0;
+  assign rd_data[23:16] = (rd_en && rd_mode[1])   ? {mem[rd_addr+2]} : 8'b0;
+  assign rd_data[31:24] = (rd_en && rd_mode[1])   ? {mem[rd_addr+3]} : 8'b0;
 
   // right now there is no check for valid memory area, it could be added by adding two more signals in the port list
-  // will keep it simple now, later will add depends on the need!
+  // will keep it simple now, later we will expand, depends on the need!
 endmodule
 
 

@@ -200,7 +200,6 @@ reading the data from the new address only happens at the positive edge never in
 
 
 
-
 **Creating Read and Write Data Memory in Verilog**
 In this *Verilog* module, we have to provide *wire* for providing the data to write in the memory, 
 as well as *write enable* signal. 
@@ -329,16 +328,18 @@ aligned memory access for read-only, and read-and-write memory.
 
 
 **Aligned Memory**
+
 Note, in the earlier memory code (either read instruction only or read-write memory modules),
-modules are written in a parameter way so that we can modify the data width, address width, 
-and depth of those data areas. A valid address is mapped to the data, 
+modules are written in a parameter way so that we can modify the data width, address width,
+and depth of those data areas. A valid address is mapped to the data,
 it is parameterized to have a certain data width in that module instance.
 
-In the memory blocks, each byte should be addressable separately, not specifically 2 bytes, 
-four bytes, or 8 bytes. Memory blocks like *SRAM, RAM, ROM, flash memory, etc,* 
-are not just designed for one specific architecture style but more for a general case.
+In the memory blocks, each byte should be addressable separately, not specifically 2 bytes,
+four bytes, or 8 bytes. Memory blocks like *SRAM, RAM, ROM, flash memory, etc,*
+are not just designed for one specific architectural style but more for a general case.
 
-So let's work on the aligned memory space module, the code is available in the subfolder with test bench 
+So let's work on the aligned memory space module (in little-endien), the code is available 
+in the subfolder *processorBlocks* with the test bench
 
 
 ```verilog
@@ -365,9 +366,19 @@ So let's work on the aligned memory space module, the code is available in the s
   assign isValid = ( iaddr >= START_ADDRESS && iaddr <= STOP_ADDRESS) ? 1'b1 : 1'b0;
   assign instruction = {{mem[{iaddr[31:2],2'b11}]}, {mem[{iaddr[31:2],2'b10}]}, {mem[{iaddr[31:2],2'b01}]}, {mem[{iaddr[31:2],2'b00}]} };
 endmodule
+```
+In the above module, we load the aligned 4 bytes of instruction from the address (should be divisible by 4)
+instantaneously as soon as the address changes, and we have an additional signal to indicate the validity 
+of the instruction, if the address memory is out of range, we made this signal to indicate that the address 
+is not in a valid range.
+
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/alignedInstructionMemory.png" alt="J" width="800"/>
+
+This module is designed such that the instruction is loaded as soon as the address changes,
+it is not synched with the clock but synched with the address.
 
 
-
+```verilog
 module ByteRAM
   # (
     // parameter to set memory withing this region, stop address is excluded
@@ -380,12 +391,12 @@ module ByteRAM
   input [31:0] wr_addr,
   input        wr_en,
   input [31:0] wr_data,
-  input [1:0]  by_wlen, // byte write len
+  input [1:0]  wr_mode, // mode 0, single byte, 1 for half word, 2 for full word
 
   // read address with enable signal, and number of bytes
   input [31:0] rd_addr,
   input        rd_en,
-  input [1:0]  by_rlen,
+  input [1:0]  rd_mode,
   output [31:0] rd_data
   );
 
@@ -395,21 +406,27 @@ module ByteRAM
     if (wr_en) begin
       // there is atleast one byte to write
       mem[wr_addr+0] <= wr_data[7:0];
-      mem[wr_addr+1] <= (|by_wlen)   ? wr_data[15:8]  : mem[wr_addr+1];
-      mem[wr_addr+2] <= (by_wlen[1]) ? wr_data[23:16] : mem[wr_addr+2];
-      mem[wr_addr+3] <= (&by_wlen)   ? wr_data[31:24] : mem[wr_addr+3];
+      mem[wr_addr+1] <= (wr_mode[0])   ? wr_data[15:8]  : mem[wr_addr+1];
+      mem[wr_addr+2] <= (wr_mode[1])   ? wr_data[23:16] : mem[wr_addr+2];
+      mem[wr_addr+3] <= (wr_mode[1])   ? wr_data[31:24] : mem[wr_addr+3];
       // note here this block is writing without alignment constraints
-      // now we could realize why reading consecutive memory is faster than
-      // reading byte here and there in c program
     end
   end
-  assign rd_data[7:0]   = (rd_en)               ? {mem[rd_addr+0]} : 8'b0;
-  assign rd_data[15:8]  = (rd_en && |by_rlen)   ? {mem[rd_addr+1]} : 8'b0;
-  assign rd_data[23:16] = (rd_en && by_rlen[1]) ? {mem[rd_addr+2]} : 8'b0;
-  assign rd_data[31:24] = (rd_en && &by_rlen)   ? {mem[rd_addr+3]} : 8'b0;
+  assign rd_data[7:0]   = (rd_en)                 ? {mem[rd_addr+0]} : 8'b0;
+  assign rd_data[15:8]  = (rd_en && rd_mode[0])   ? {mem[rd_addr+1]} : 8'b0;
+  assign rd_data[23:16] = (rd_en && rd_mode[1])   ? {mem[rd_addr+2]} : 8'b0;
+  assign rd_data[31:24] = (rd_en && rd_mode[1])   ? {mem[rd_addr+3]} : 8'b0;
 
+  // right now there is no check for valid memory area, it could be added by adding two more signals in the port list
+  // will keep it simple now, later we will expand, depends on the need!
 endmodule
 ```
+
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/readByteMemory_pr1.png" alt="J" width="800"/>
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/readByteMemory_pr2.png" alt="J" width="800"/>
+
+In the above module, based on the write/read mode, it can read/write a byte, half-word, and word. Writing the provided data
+at the address is done on the positive edge. Whereus reading the data from the address is done instantaneously.
 
 **Parts of Processor**
 
