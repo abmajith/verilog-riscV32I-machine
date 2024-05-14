@@ -3,6 +3,7 @@
 module IV32IALU_tb;
   
   reg clk = 0;
+  reg alu_execute = 1;
   //operands
   reg [31:0] operandA = 0;
   reg [31:0] operandB = 0;
@@ -17,6 +18,7 @@ module IV32IALU_tb;
 
   // instantiate arithmetic logic unit 
   IV32IALU uut (
+    .alu_execute(alu_execute),
     .op_a(operandA),
     .op_b(operandB),
     .funct3(funct3),

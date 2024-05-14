@@ -1,5 +1,7 @@
 module IV32IALU
   (
+  // control unit to execute alu or not
+  input wire  alu_execute,
   // there are two operands
   input wire [31:0] op_a,
   input wire [31:0] op_b,
@@ -32,34 +34,42 @@ module IV32IALU
   
   
   always @(*) begin
-    overflow  = (op_sign)  ? ((op_a[31] ^ op_b[31]) & (op_a[31] ^ minus[31])) : 
-                              ~(op_a[31] ^ op_b[31]) & (op_a[31] ^ sum[31]);
+    if (alu_execute) begin
+      overflow  = (op_sign)  ? ((op_a[31] ^ op_b[31]) & (op_a[31] ^ minus[31])) : 
+                                ~(op_a[31] ^ op_b[31]) & (op_a[31] ^ sum[31]);
+    end else begin
+      overflow = 1'b0;
+    end
   end
 
   always @ (*) begin
-    case(funct3)
-      // subtraction/addition
-      3'b000: result = (op_sign) ? minus[31:0] : sum;
-      // sll
-      3'b001: result = (op_a << shamt);
-      // slt
-      3'b010: result = {31'b0, LT};
-      // sltu
-      3'b011: result = {31'b0,LTU};
-      // xor
-      3'b100: result = (op_a ^ op_b);
+    if (alu_execute) begin
+      case(funct3)
+        // subtraction/addition
+        3'b000: result = (op_sign) ? minus[31:0] : sum;
+        // sll
+        3'b001: result = (op_a << shamt);
+        // slt
+        3'b010: result = {31'b0, LT};
+        // sltu
+        3'b011: result = {31'b0,LTU};
+        // xor
+        3'b100: result = (op_a ^ op_b);
 
-      // sra/srl
-      3'b101: result = (op_sign) ? ($signed(op_a) >>> shamt) : ($signed(op_a) >> shamt); 
+        // sra/srl
+        3'b101: result = (op_sign) ? ($signed(op_a) >>> shamt) : ($signed(op_a) >> shamt); 
 
-      // or
-      3'b110: result = (op_a | op_b);
-      // and
-      3'b111: result = (op_a & op_b);
+        // or
+        3'b110: result = (op_a | op_b);
+        // and
+        3'b111: result = (op_a & op_b);
 
-      default: result = 32'b0;
+        default: result = 32'b0;
 
-    endcase
-  end
+      endcase
+    end else begin
+      result = 32'b0;
+    end // if else
+  end // always
 
 endmodule

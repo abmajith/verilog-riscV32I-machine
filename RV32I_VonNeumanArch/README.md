@@ -766,15 +766,17 @@ propagation dealy, it can be neglected with clock cycle duration is reasonably l
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/fetchDecodePhase.jpg" alt="J" width="800"/>
 
 
-*Arithmetic Logic Unit* (ALU), In the *RV32I* base instruction format, there are around 40 instructions,
-among them, 19 arithmetic instructions (10 perform only on registers and 9 with immediate and registers value).
+*Arithmetic Logic Unit* (ALU), In *RV32I* base instruction format, there are around 40 instructions,
+among them, 19 arithmetic instructions (10 perform only on registers and 9 with immediate and registers value). 
 
-Let's write them in simple modular form to do just arithmetic operations, hide the details of instruction type,
-pass the two operands, and get back the arithmetic results and status values. 
+Let's write them in simple modular form to do just arithmetic operations in combinational logic circuit, 
+hide the details of instruction type, pass the two operands, and get back the arithmetic results and status values. 
 
 ```verilog
 module IV32IALU
   (
+  // control unit to execute alu or not
+  input wire  alu_execute,
   // there are two operands
   input wire [31:0] op_a,
   input wire [31:0] op_b,
@@ -798,7 +800,7 @@ module IV32IALU
 
   // if subtract use one's complement and add one otherwise normal sum
   assign sum      = op_a + op_b;
-  assign minus    = {1'b0, op_a} + {1'b1, ~op_b} + 33'b1; // minus by doing 2's complement
+  assign minus    = {1'b0, op_a} + {1'b1, ~op_b} + 33'b1;
   assign zero     = (|result) ? 1'b0 : 1'b1; // if the result is zero, set the zero wire
   assign negative = result[31];
   assign LT       = (op_a[31] ^ op_b[31]) ? op_a[31] : minus[32];
@@ -807,90 +809,108 @@ module IV32IALU
   
   
   always @(*) begin
-    overflow  = (op_sign)  ? ((op_a[31] ^ op_b[31]) & (op_a[31] ^ minus[31])) : 
-                              ~(op_a[31] ^ op_b[31]) & (op_a[31] ^ sum[31]);
+    if (alu_execute) begin
+      overflow  = (op_sign)  ? ((op_a[31] ^ op_b[31]) & (op_a[31] ^ minus[31])) : 
+                                ~(op_a[31] ^ op_b[31]) & (op_a[31] ^ sum[31]);
+    end else begin
+      overflow = 1'b0;
+    end
   end
 
   always @ (*) begin
-    case(funct3)
-      // subtraction/addition
-      3'b000: result = (op_sign) ? minus[31:0] : sum;
-      // sll
-      3'b001: result = (op_a << shamt);
-      // slt
-      3'b010: result = {31'b0, LT};
-      // sltu
-      3'b011: result = {31'b0,LTU};
-      // xor
-      3'b100: result = (op_a ^ op_b);
+    if (alu_execute) begin
+      case(funct3)
+        // subtraction/addition
+        3'b000: result = (op_sign) ? minus[31:0] : sum;
+        // sll
+        3'b001: result = (op_a << shamt);
+        // slt
+        3'b010: result = {31'b0, LT};
+        // sltu
+        3'b011: result = {31'b0,LTU};
+        // xor
+        3'b100: result = (op_a ^ op_b);
 
-      // sra/srl
-      3'b101: result = (op_sign) ? ($signed(op_a) >>> shamt) : ($signed(op_a) >> shamt); 
+        // sra/srl
+        3'b101: result = (op_sign) ? ($signed(op_a) >>> shamt) : ($signed(op_a) >> shamt); 
 
-      // or
-      3'b110: result = (op_a | op_b);
-      // and
-      3'b111: result = (op_a & op_b);
+        // or
+        3'b110: result = (op_a | op_b);
+        // and
+        3'b111: result = (op_a & op_b);
 
-      default: result = 32'b0;
+        default: result = 32'b0;
 
-    endcase
-  end
+      endcase
+    end else begin
+      result = 32'b0;
+    end // if else
+  end // always
 
 endmodule
 ```
 
-Let's see verilog code snippet for loading the operands from register file
+Let's see verilog code snippet to add on the processor module for loading the operands 
+from register file and execute alu combinational circuit
 ```verilog
+module processor
 ...
-reg en_wr;
-//registerfile instance
-registerFile # (
-  .REG_DEPTH(32),
-  .REG_WIDTH(32),
-  .RADDR_WIDTH(5)
-) registerBankInst (
-    .clk(clk),
-    .rst(rst),
-    .we(en_wr),
-    .rs1_addr(rs1_addr),
-    .rs2_addr(rs2_addr),
-    .rd_addr(rd_addr),
-    .rd_value(rd_value),
-    .rs1_value(rs1_value),
-    .rs2_value(rs2_value)
-  );
+  // to set the write back to the register banks
+  reg en_wr = 1'b0;  // default
+  // couple of wires to signal 32-bit value
+  wire [31:0] rs1_value;
+  wire [31:0] rs2_value;
+  wire [31:0] rd_value;
 
-wire op_sign;
-assign op_sign = funct7[5];
+  //registerfile instance
+  registerFile # (
+      .REG_DEPTH(32),
+      .REG_WIDTH(32),
+      .RADDR_WIDTH(5)
+    )  regBank (
+      // clock and reset signals
+      .clk(clk),
+      .rst(rst),
+      // writing the result mode?
+      .we(en_wr),
+      // source and destinatin register address
+      .rs1_addr(rs1_ad),
+      .rs2_addr(rs2_ad),
+      .rd_addr(rd_ad),
+      .rd_value(rd_value),
+      .rs1_value(rs1_value),
+      .rs2_value(rs2_value)
+    );
+  // for making the appropriate operands for the instruction
+  reg [31:0] op_a;
+  reg [31:0] op_b;
 
-reg zero;
-reg negative;
-reg overflow;
-reg [31:0] alu_result;
-// alu instance
-IV32IALU (
-  .op_a(op_a),
-  .op_b(op_b),
-  .funct3(funct3),
-  .op_sign(op_sign),
+  // couples of signals and registers for alu unit
+  wire        alu_zero;
+  wire        alu_negative;
+  wire        alu_overflow;
+  wire [31:0] alu_result;
+  wire op_sign = inst[30];
+  wire alu_execute = (is_alu_reg || is_alu_imm) ? 1'b1 : 1'b0;
 
-  .zero(zero),
-  .negative(negative),
-  .overflow(overflow),
-  .result(alu_result)
-);
+  // alu instance
+  IV32IALU alu (
+        // control signals
+        .alu_execute(alu_execute),
+        // operands and function code
+        .op_a(op_a),
+        .op_b(op_b),
+        .funct3(funct3),
+        .op_sign(op_sign),
+        // alu output with some flags
+        .zero(alu_zero),
+        .negative(alu_negative),
+        .overflow(alu_overflow),
+        .result(alu_result)
+    );
+
 ...
-en_wr = 1'b0; // before executing alu circuit, it should be set zero,
-//exact implemention involves some clock triggered and state based one, verilog is hard wired circuit!
-...
-op_a = (rg_re1) ? rs1_value: 32'b0;
-op_b = (rg_re2) ? rs2_value: (is_alu_imm) ? ImmediateOperand : 32'b0;
-...
-rd_value = ((is_alu_reg || is_alu_imm) && rg_we) ? alu_result : 32'b0;
-en_wr = (is_alu_reg || is_alu_imm) ? rg_wr : 1'b0; // if it is arithmetic related operation, perform write enable 
-// to write on rd_addr register address with value rd_value
-
+endmodule
 ```
 
 Let's grasp the register loading and performing arithmetic operations in the block diagram as below.
