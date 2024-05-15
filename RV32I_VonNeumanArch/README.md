@@ -975,7 +975,7 @@ As usual we will do test this module by simulation, we keep this habbit all the 
 branch and test bench codes in the sub folder *processorBlocks*
 
 
-Let's see the code snippet for the load/store and other jump, and upper immediate instructions here,
+Let's see the code snippet for load/store, jump, and upper immediate instructions here,
 this time we wont create them in module, but rather implement within the processor code block!.
 
 ```verilog
@@ -1034,6 +1034,7 @@ module processor
     straight forward apporach */
 
 ...
+endmodule
 ```
 
 
