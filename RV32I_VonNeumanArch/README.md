@@ -929,7 +929,7 @@ branch that has 6 *RV32I* instructions.
 
 
 ```verilog
-module branch_predicates (
+module IV32IBranch (
   // control unit to execute branch unit
   input wire br_execute,
   // there are two operands
@@ -971,9 +971,15 @@ module branch_predicates (
 
 endmodule
 ```
-As usual we will do test the above module by simulation, we keep this habbit all the way to complete processor module!
-branch and test bench codes in the sub folder processorBlocks
+As usual we will do test this module by simulation, we keep this habbit all the way, 
+branch and test bench codes in the sub folder *processorBlocks*
 
+
+Let's see the code snippet for the load/store and other jump, and upper immediate instructions here,
+this time we wont create them in module, but rather implement within the processor code block!.
+
+
+<!--
 that executes the *RV32I* base instruction set, all it has to do is bind all the modules so far created
 and form extra logic for performing load/store data from/to memory (RAM), jump and link registers instruction logic, 
 and branch instruction logic. The design principle we followed is called the modular and bottom-up approach. We
@@ -982,3 +988,4 @@ Here, for the first time, we will draw a block diagram for a processor with vari
 *memory, ALU, Register, decoder, PC, control and status register, etc.*
 
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/proc_internals.jpg" alt="J" width="1200"/>
+-->

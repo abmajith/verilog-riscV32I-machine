@@ -1,4 +1,4 @@
-module branch_predicates (
+module IV32IBranch (
   // control unit to execute branch unit
   input wire br_execute,
   // there are two operands
