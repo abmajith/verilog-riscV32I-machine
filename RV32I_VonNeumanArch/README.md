@@ -120,8 +120,6 @@ Let's see some basic building blocks inside the processor and key interrupt hand
 		This causes the processor to reload the saved state either from *stack* or *shadow registers*
 
 **Install Verilog and gtkwave in Ubuntu**
-I am sorry if you are using other than *Linux*! OS. I never had an opportunity to run other 
-*OS* besides watching movies with my friends on their computers.
 
 To install *Verilog, gtkwave*
 ```bash
@@ -131,7 +129,8 @@ sudo apt-get install iverilog gtkwave
 gtkwave --version
 iverilog -V
 ```
-In other *Linux* distributions, it would be similar.
+In other *Linux* distributions, it would be similar. For other *OS* like mac/windows, there should be
+well-known and used IDEs out there, I will search and add them here in the future.
 
 To have short and effective tutorial on *Verilog* one can follow 
 <a href="https://www.chipverify.com/tutorials/verilog" class="custom-link">this tutorial</a>.
@@ -1036,7 +1035,23 @@ module processor
 ...
 endmodule
 ```
+So, far we have all combinational logical circuits to perform *alu, branch, jal, jalr, luipc, lui*, and
+for load/store, we have logic to have load/store address, in case of *load* we have the wire signal that
+have read data from ram memory, and for *store* we have *op_a* as write data memory.
 
+Let's discuss how we are going to organize the processor, for our simple processor design, we omitted the
+pipeline mechanism to build processors (almost all high-performance use this technique), instead we will design a simple multi-cycle *processor*.
+
+- In a multi-cycle processor, different stages of instruction execution occur in separate clock cycles. 
+  For example, one clock cycle might be used for fetching the instruction, another for decoding and executing it, 
+  and another for memory access and write-back.
+- This allows the clock cycle to be shorter since each clock cycle only needs to accommodate one stage of the 
+  instruction cycle. However, the total number of clock cycles per instruction is increased.
+- Recall each memory access or write back has some propagation delay, even the logical circuits inside the processor have propagation delay.
+
+Here, we build a complete processor a Von-Neuman architecture, and a multi-cycle *processor*.
+
+First, we see the clock timing diagram and how each *clock* cycle is organized and used.
 
 <!--
 that executes the *RV32I* base instruction set, all it has to do is bind all the modules so far created
