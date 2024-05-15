@@ -978,6 +978,64 @@ branch and test bench codes in the sub folder *processorBlocks*
 Let's see the code snippet for the load/store and other jump, and upper immediate instructions here,
 this time we wont create them in module, but rather implement within the processor code block!.
 
+```verilog
+module processor
+...
+/* if lui, then immediate value is the result,
+    if auipc, the adding immediate value with PC is the operation result */
+
+  wire [31:0] lui_auipc_result = (is_lui) ? immediate_value :
+                                    (is_auipc) ? (immediate_value + PC) :
+                                        32'b0;
+
+  /* if jal or jalr, the instruction result is same*/
+
+  wire [31:0] jal_jalr_result = (is_jal || is_jalr) ? PC + 4 : 32'b0;
+
+  /*for system instruction type decided by is_system, we will run the
+    asembly program in a loop. i.e initialize PC to start address of assembly code */
+  /*we are not doing fence instruction, */
+
+
+  /* compute the load_mem_addr and store_mem_addr based on the instruction type */
+  wire [31:0] load_mem_addr  = (is_load)  ? op_a + immediate_value : 32'b0;
+  wire [31:0] store_mem_addr = (is_store) ? op_b + immediate_value : 32'b0;
+  /* we do need the mode, i.e half word or full word or a byte,
+    it is decided by the funct3 operations*/
+  wire [1:0] mode_load  = (is_load)  ? funct3[1:0] : 2'b0;
+  wire [1:0] mode_store = (is_store) ? funct3[1:0] : 2'b0;
+  // loaded data by load instruction
+  wire [31:0] load_read_data;
+
+  // signal for enabling the RAM write and read data
+  reg wr_en_RAM = 0; // default dont write
+  reg rd_en_RAM = 0; // default dont read anything
+
+  // instance for read/write data memory
+  ByteRAM # (
+    .START_ADDRESS(1024),
+    .STOP_ADDRESS(2047) // a block of 1024 bytes for read and write data
+  ) rwDataMem (
+    // clock signals
+    .clk(clk),
+    // various signals for write action
+    .wr_addr(store_mem_addr),
+    .wr_en(wr_en_RAM),
+    .wr_data(op_a),
+    .wr_mode(mode_store),
+    // various signals for read action
+    .rd_addr(load_mem_addr),
+    .rd_en(rd_en_RAM),
+    .rd_mode(mode_load),
+    .rd_data(load_read_data)
+  );
+  /* how simple load/store instructions design of RV32I, 
+    not complicated with memory access, 
+    straight forward apporach */
+
+...
+```
+
 
 <!--
 that executes the *RV32I* base instruction set, all it has to do is bind all the modules so far created

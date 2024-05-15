@@ -6,15 +6,17 @@ module processor(
   
   // program counter act as instruction address
   reg [31:0] PC;
+  // to load the next instruction address
+  reg [31:0] nextPC;
 
   // for holding current instruction and its validity
   wire [31:0] inst;
   wire        isValidInst;
 
   // couple of wires to hold current instruction fields signals
-  wire [6:0] opCode;
-  wire [2:0] funct3;
-  wire [6:0] funct7;
+  wire [6:0]  opCode;
+  wire [2:0]  funct3;
+  wire [6:0]  funct7;
   wire [31:0] immediate_value;
   
   // register source and destination address and its mode signals for the current instruction
@@ -81,7 +83,7 @@ module processor(
   );
   
   // to set the write back to the register banks
-  reg en_wr = 1'b0;  // default
+  reg en_wr_reg = 1'b0;  // default
   // couple of wires to signal 32-bit value
   wire [31:0] rs1_value;
   wire [31:0] rs2_value;
@@ -97,8 +99,8 @@ module processor(
       .clk(clk),
       .rst(rst),
       // writing the result mode?
-      .we(en_wr),
-      // source and destinatin register address
+      .we(en_wr_reg),
+      // source and destination register address
       .rs1_addr(rs1_ad),
       .rs2_addr(rs2_ad),
       .rd_addr(rd_ad),
@@ -133,7 +135,71 @@ module processor(
         .zero(alu_zero),
         .negative(alu_negative),
         .overflow(alu_overflow),
+        // result of alu
         .result(alu_result)
     );
+  
+  
+  wire branch_result;
+  // branch unit
+  IV32IBranch brUnit (
+      // control signals
+      .br_execute(is_branch),
+      // operands
+      .op_a(op_a),
+      .op_b(op_b),
+      // type of branch
+      .funct3(funct3),
+      // result of branch
+      .do_branch(branch_result)
+    );
+  
+  /* if lui, then immediate value is the result, 
+    if auipc, the adding immediate value with PC is the operation result */
+  wire [31:0] lui_auipc_result = (is_lui) ? immediate_value :
+                                    (is_auipc) ? (immediate_value + PC) :
+                                        32'b0;
+  
+  /* if jal or jalr, the instruction result is same*/
 
+  wire [31:0] jal_jalr_result = (is_jal || is_jalr) ? PC + 4 : 32'b0;
+  
+  /*for system instruction type decided by is_system, we will run the 
+    asembly program in a loop. i.e initialize PC to start address of assembly code */
+  /*we are not doing fence instruction, */
+  
+
+  /* compute the load_mem_addr and store_mem_addr based on the instruction type */
+  wire [31:0] load_mem_addr  = (is_load)  ? op_a + immediate_value : 32'b0;
+  wire [31:0] store_mem_addr = (is_store) ? op_b + immediate_value : 32'b0;
+  /* we do need the mode, i.e half word or full word or a byte,
+    it is decided by the funct3 operations*/
+  wire [1:0] mode_load  = (is_load)  ? funct3[1:0] : 2'b0;
+  wire [1:0] mode_store = (is_store) ? funct3[1:0] : 2'b0;
+  // loaded data by load instruction
+  wire [31:0] load_read_data;
+
+  // signal for enabling the RAM write and read data
+  reg wr_en_RAM = 0; // default dont write
+  reg rd_en_RAM = 0; // default dont read anything
+
+  // instance for read/write data memory
+  ByteRAM # (
+    .START_ADDRESS(1024),
+    .STOP_ADDRESS(2047) // a block of 1024 bytes for read and write data
+  ) rwDataMem (
+    // clock signals
+    .clk(clk),
+    // various signals for write action
+    .wr_addr(store_mem_addr),
+    .wr_en(wr_en_RAM),
+    .wr_data(op_a),
+    .wr_mode(mode_store),
+    // various signals for read action
+    .rd_addr(load_mem_addr),
+    .rd_en(rd_en_RAM),
+    .rd_mode(mode_load),
+    .rd_data(load_read_data)
+  );
+  
 endmodule
