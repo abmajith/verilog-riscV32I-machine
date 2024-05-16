@@ -1078,6 +1078,9 @@ Cycle-3: Writeback and NextPC
 - update PC for the next instruction.
 
 
+
+Three state processor verilog snippets as follows,
+
 ```verilog
 module processor
 ...
