@@ -1036,8 +1036,8 @@ module processor
 endmodule
 ```
 So, far we have all combinational logical circuits to perform *alu, branch, jal, jalr, luipc, lui*, and
-for load/store, we have logic to have load/store address, in case of *load* we have the wire signal that
-have read data from ram memory, and for *store* we have *op_a* as write data memory.
+for *load/store*, we have logic to have load/store address, in case of *load* we have the wire signal that
+have read data from ram memory, and for *store* we have *op/_a* as write data memory.
 
 Let's discuss how we are going to organize the processor, for our simple processor design, we omitted the
 pipeline mechanism to build processors (almost all high-performance use this technique), instead we will design a simple multi-cycle *processor*.
@@ -1052,14 +1052,6 @@ pipeline mechanism to build processors (almost all high-performance use this tec
 Here, we build a complete processor a Von-Neuman architecture, and a multi-cycle *processor*.
 
 First, we see the clock timing diagram and how each *clock* cycle is organized and used.
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/timingDiagram_multi-cycle-processor.jpg" alt="J" width="1200"/>
 
-<!--
-that executes the *RV32I* base instruction set, all it has to do is bind all the modules so far created
-and form extra logic for performing load/store data from/to memory (RAM), jump and link registers instruction logic, 
-and branch instruction logic. The design principle we followed is called the modular and bottom-up approach. We
-discussed a bit about processor and memory access, without looking into the block diagram of a processor.
-Here, for the first time, we will draw a block diagram for a processor with various blocks like
-*memory, ALU, Register, decoder, PC, control and status register, etc.*
 
-<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/proc_internals.jpg" alt="J" width="1200"/>
--->
