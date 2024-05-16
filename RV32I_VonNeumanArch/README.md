@@ -1052,11 +1052,11 @@ pipeline mechanism to build processors (almost all high-performance use this tec
 Here, we build a complete processor a Von-Neuman architecture, and a multi-cycle *processor*.
 
 First, we see the clock timing diagram and how each *clock* cycle is organized and used.
-<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/timingDiagram_multi-cycle-processor.jpg" alt="J" width="1200"/>
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/timingDiagram_multi-cycle-processor.jpg" alt="J" width="800"/>
 
 In the above picture, we see a three clocks cycle processor states, this three cycle processor states can be seen as following 
 state diagram. 
 
-<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/three_cycle_processor_state.jpg" alt="J" width="1200"/>
+<img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/three_cycle_processor_state.jpg" alt="J" width="800"/>
 
 
