@@ -1060,3 +1060,49 @@ state diagram.
 <img src="https://github.com/abmajith/verilog-riscV32I-machine/blob/main/RV32I_VonNeumanArch/processorBlocks/three_cycle_processor_state.jpg" alt="J" width="800"/>
 
 
+In this 3-cycle processor design.
+
+Cycle-1: Fetch and Decode
+- fetch the instruction from memory.
+- decode the instruction to extract opcode, funct3, funct7, rs1, rs2, rd, and immediate values.
+- determine the type of instruction (ALU, Load, Store, Branch, etc.).
+
+Cycle-2: Execute
+- perform the ALU operation.
+- calculate the memory address for load/store instructions.
+- evaluate branch conditions.
+- perform *AUIPC, LUI, JAL, JALR* instructions
+
+Cycle-3: Writeback and NextPC
+- write the result to the register file or memory
+- update PC for the next instruction.
+
+
+```verilog
+module processor
+...
+  // Internal state machine
+  parameter FETCH_DECODE = 2'b00;
+  parameter EXECUTE      = 2'b01;
+  parameter WRITEBACK    = 2'b10;
+
+  // Internal signals
+  reg [1:0] state;
+  reg [1:0] next_state;
+
+  // state machine movements
+  always @ (posedge clk or posedge rst) begin
+    if (rst) begin
+      state <= FETCH_DECODE;
+      PC    <= 0;
+    end else begin
+      state <= next_state;
+      PC    <= nextPC;
+    end
+  end
+...
+```
+
+I added the 3-cycle processor full verilog code in the subfolder *processorBlocks* as file name 
+*multi_cycle_von_neuman_processor.v*. I will write the details of timing diagram and verification 
+of written processor soon!.
